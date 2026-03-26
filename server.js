@@ -267,10 +267,9 @@ app.get('/api/admin/:secret/stocks', async (req, res) => {
     res.json(await getStockPrices());
 });
 
-app.get('/', (req, res) => {
+app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
-
 app.listen(PORT, () => {
     console.log(`✅ Server running on port ${PORT}`);
 });
