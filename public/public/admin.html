@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Holdings - Admin Control Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0c10;
+            color: #e4e6eb;
+            padding: 2rem;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, #ff3b30, #cc2f24);
+            padding: 2rem;
+            border-radius: 24px;
+            margin-bottom: 2rem;
+        }
+        .header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; }
+        .card {
+            background: rgba(20, 22, 27, 0.95);
+            border: 1px solid rgba(0, 255, 100, 0.2);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card h2 { color: #00ff88; margin-bottom: 1rem; font-size: 1.3rem; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; color: #8e9aaf; }
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            background: #1a1c22;
+            border: 1px solid rgba(0,255,100,0.2);
+            border-radius: 10px;
+            color: white;
+        }
+        button {
+            background: linear-gradient(135deg, #00ff88, #00cc66);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+        .btn-danger { background: linear-gradient(135deg, #ff3b30, #cc2f24); color: white; }
+        .btn-warning { background: linear-gradient(135deg, #ff9500, #cc7700); color: white; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        th { color: #00ff88; }
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .alert.success { background: rgba(0,255,100,0.1); border: 1px solid #00ff88; color: #00ff88; display: block; }
+        .alert.error { background: rgba(255,59,48,0.1); border: 1px solid #ff3b30; color: #ff3b30; display: block; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-box {
+            background: rgba(0,255,100,0.1);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-number { font-size: 1.8rem; font-weight: bold; color: #00ff88; }
+        .stat-label { font-size: 0.8rem; color: #8e9aaf; }
+        .tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .tab { padding: 0.75rem 1.5rem; cursor: pointer; background: none; border: none; color: #8e9aaf; }
+        .tab.active { color: #00ff88; border-bottom: 2px solid #00ff88; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 APEX HOLDINGS - ADMIN CONTROL CENTER</h1>
+            <p>⚠️ FULL SYSTEM CONTROL - Manage Users, Stocks, Transactions & System Settings</p>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-box"><div class="stat-number" id="totalUsers">-</div><div class="stat-label">Total Users</div></div>
+            <div class="stat-box"><div class="stat-number" id="totalCash">-</div><div class="stat-label">Total Cash</div></div>
+            <div class="stat-box"><div class="stat-number" id="totalTrades">-</div><div class="stat-label">Total Trades</div></div>
+            <div class="stat-box"><div class="stat-number" id="totalPortfolio">-</div><div class="stat-label">Portfolio Value</div></div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('users')">👥 Users</button>
+            <button class="tab" onclick="showTab('stocks')">📈 Stocks</button>
+            <button class="tab" onclick="showTab('transactions')">📋 Transactions</button>
+            <button class="tab" onclick="showTab('system')">⚙️ System</button>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="usersTab" class="tab-content active">
+            <div class="card">
+                <h2>👤 Manage Users</h2>
+                <div id="userAlert" class="alert"></div>
+                <div class="grid" style="grid-template-columns: 1fr 1fr;">
+                    <div>
+                        <h3>Add Cash to User</h3>
+                        <div class="form-group"><label>Select User</label><select id="cashUserId"></select></div>
+                        <div class="form-group"><label>Amount ($)</label><input type="number" id="cashAmount" placeholder="Amount"></div>
+                        <button onclick="addCash()">Add Cash</button>
+                        <button onclick="setExactCash()" class="btn-warning">Set Exact Cash</button>
+                    </div>
+                    <div>
+                        <h3>Reset / Delete User</h3>
+                        <div class="form-group"><label>Select User</label><select id="resetUserId"></select></div>
+                        <button onclick="resetUser()" class="btn-warning">🔄 Reset Account ($100k)</button>
+                        <button onclick="deleteUser()" class="btn-danger">🗑️ DELETE USER</button>
+                    </div>
+                </div>
+                <div id="usersList"></div>
+            </div>
+        </div>
+
+        <!-- Stocks Tab -->
+        <div id="stocksTab" class="tab-content">
+            <div class="card">
+                <h2>📈 Stock Management</h2>
+                <div id="stockAlert" class="alert"></div>
+                <div class="grid" style="grid-template-columns: 1fr 1fr;">
+                    <div>
+                        <h3>Update Stock Price</h3>
+                        <div class="form-group"><label>Select Stock</label><select id="stockSymbol"></select></div>
+                        <div class="form-group"><label>New Price ($)</label><input type="number" id="stockPrice" step="0.01"></div>
+                        <button onclick="updatePrice()">Update Price</button>
+                    </div>
+                    <div>
+                        <h3>Edit Stock Details</h3>
+                        <div class="form-group"><label>Select Stock</label><select id="editStockSymbol" onchange="loadStockDetails()"></select></div>
+                        <div class="form-group"><label>Name</label><input type="text" id="stockName"></div>
+                        <div class="form-group"><label>Volume</label><input type="text" id="stockVolume"></div>
+                        <div class="form-group"><label>Market Cap</label><input type="text" id="stockMarketCap"></div>
+                        <button onclick="updateStockDetails()">Update Details</button>
+                    </div>
+                </div>
+                <div id="stocksList"></div>
+                <hr style="margin: 1rem 0; border-color: rgba(255,255,255,0.1);">
+                <h3>➕ Add New Stock</h3>
+                <div class="grid" style="grid-template-columns: repeat(4, 1fr);">
+                    <input type="text" id="newSymbol" placeholder="Symbol (e.g., NFLX)">
+                    <input type="text" id="newName" placeholder="Company Name">
+                    <input type="number" id="newPrice" placeholder="Price">
+                    <button onclick="addStock()">Add Stock</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions Tab -->
+        <div id="transactionsTab" class="tab-content">
+            <div class="card">
+                <h2>📋 All Transactions</h2>
+                <div id="transactionsList"></div>
+            </div>
+        </div>
+
+        <!-- System Tab -->
+        <div id="systemTab" class="tab-content">
+            <div class="card">
+                <h2>⚙️ System Control</h2>
+                <div id="systemAlert" class="alert"></div>
+                <p><strong>Admin Secret:</strong> ApexMaster2024</p>
+                <p><strong>Admin Panel URL:</strong> /admin.html (hidden from users)</p>
+                <button onclick="refreshData()">🔄 Refresh All Data</button>
+                <button onclick="exportData()" class="btn-warning">📥 Export Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_SECRET = 'ApexMaster2024';
+
+        async function loadStats() {
+            const res = await fetch(`/api/admin/${ADMIN_SECRET}/stats`);
+            const stats = await res.json();
+            document.getElementById('totalUsers').innerText = stats.totalUsers || 0;
+            document.getElementById('totalCash').innerText = `$${(stats.totalCash || 0).toLocaleString()}`;
+            document.getElementById('totalTrades').innerText = stats.totalTrades || 0;
+            document.getElementById('totalPortfolio').innerText = `$${(stats.totalPortfolioValue || 0).toLocaleString()}`;
+        }
+
+        async function loadUsers() {
+            const res = await fetch(`/api/admin/${ADMIN_SECRET}/users`);
+            const users = await res.json();
+            
+            const userSelect = document.getElementById('cashUserId');
+            const resetSelect = document.getElementById('resetUserId');
+            userSelect.innerHTML = '<option value="">Select user...</option>';
+            resetSelect.innerHTML = '<option value="">Select user...</option>';
+            
+            users.forEach(u => {
+                userSelect.innerHTML += `<option value="${u.id}">${u.username} - $${(u.cash || 0).toLocaleString()}</option>`;
+                resetSelect.innerHTML += `<option value="${u.id}">${u.username} - $${(u.cash || 0).toLocaleString()}</option>`;
+            });
+            
+            document.getElementById('usersList').innerHTML = `
+                <table>
+                    <thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Cash</th><th>Portfolio</th><th>Joined</th></tr></thead>
+                    <tbody>${users.map(u => `
+                        <tr>
+                            <td>${u.id}</td>
+                            <td><strong>${u.username}</strong></td>
+                            <td>${u.email}</td>
+                            <td style="color:#00ff88">$${(u.cash || 0).toLocaleString()}</td>
+                            <td>$${(u.portfolio_value || 0).toLocaleString()}</td>
+                            <td>${new Date(u.created_at).toLocaleDateString()}</td>
+                        </tr>
+                    `).join('')}</tbody>
+                </table>
+            `;
+        }
+
+        async function loadStocks() {
+            const res = await fetch(`/api/admin/${ADMIN_SECRET}/stocks`);
+            const stocks = await res.json();
+            
+            const stockSelect = document.getElementById('stockSymbol');
+            const editSelect = document.getElementById('editStockSymbol');
+            stockSelect.innerHTML = '';
+            editSelect.innerHTML = '';
+            
+            stocks.forEach(s => {
+                stockSelect.innerHTML += `<option value="${s.symbol}">${s.symbol} - $${s.price}</option>`;
+                editSelect.innerHTML += `<option value="${s.symbol}">${s.symbol} - ${s.name}</option>`;
+            });
+            
+            document.getElementById('stocksList').innerHTML = `
+                <table>
+                    <thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>Change</th><th>Volume</th><th>Mkt Cap</th><th>Day Range</th></tr></thead>
+                    <tbody>${stocks.map(s => `
+                        <tr>
+                            <td><strong>${s.symbol}</strong></td>
+                            <td>${s.name || s.symbol}</td>
+                            <td style="color:#00ff88">$${s.price.toFixed(2)}</td>
+                            <td class="${s.change >= 0 ? 'price-up' : 'price-down'}">${s.change >= 0 ? '+' : ''}${s.change || 0}%</td>
+                            <td>${(s.volume / 1000000).toFixed(1)}M</td>
+                            <td>${s.market_cap || 'N/A'}</td>
+                            <td>$${s.day_low || s.price-5} - $${s.day_high || s.price+5}</td>
+                        </tr>
+                    `).join('')}</tbody>
+                </table>
+            `;
+        }
+
+        async function loadStockDetails() {
+            const symbol = document.getElementById('editStockSymbol').value;
+            if (!symbol) return;
+            const res = await fetch(`/api/admin/${ADMIN_SECRET}/stocks`);
+            const stocks = await res.json();
+            const stock = stocks.find(s => s.symbol === symbol);
+            if (stock) {
+                document.getElementById('stockName').value = stock.name || '';
+                document.getElementById('stockVolume').value = stock.volume || '';
+                document.getElementById('stockMarketCap').value = stock.market_cap || '';
+            }
+        }
+
+        async function loadTransactions() {
+            const res = await fetch(`/api/admin/${ADMIN_SECRET}/transactions`);
+            const transactions = await res.json();
+            document.getElementById('transactionsList').innerHTML = `
+                <table>
+                    <thead><tr><th>Date</th><th>User</th><th>Symbol</th><th>Type</th><th>Shares</th><th>Price</th><th>Total</th></tr></thead>
+                    <tbody>${transactions.map(t => `
+                        <tr>
+                            <td>${new Date(t.date).toLocaleString()}</td>
+                            <td><strong>${t.username}</strong></td>
+                            <td>${t.symbol}</td>
+                            <td style="color:${t.type === 'BUY' ? '#00ff88' : '#ff3b30'}">${t.type}</td>
+                            <td>${t.shares}</td>
+                            <td>$${t.price.toFixed(2)}</td>
+                            <td>$${t.total.toFixed(2)}</td>
+                        </tr>
+                    `).join('')}</tbody>
+                </table>
+            `;
+        }
+
+        async function updatePrice() {
+            const symbol = document.getElementById('stockSymbol').value;
+            const price = parseFloat(document.getElementById('stockPrice').value);
+            if (!price) return;
+            const res = await fetch(`/api/admin/${ADMIN_SECRET}/stock/${symbol}/price`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ price })
+            });
+            const data = await res.json();
+            showAlert('stockAlert', `Price updated: $${data.oldPrice} → $${data.newPrice} (${data.change}%)`, 'success');
+            loadStocks();
+        }
+
+        async function updateStockDetails() {
+            const symbol = document.getElementById('editStockSymbol').value;
+            const name = document.getElementById('stockName').value;
+            const volume = parseInt(document.getElementById('stockVolume').value);
+            const market_cap = document.getElementById('stockMarketCap').value;
+            const res = await fetch(`/api/admin/${ADMIN_SECRET}/stock/${symbol}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, volume, market_cap })
+            });
+            showAlert('stockAlert', 'Stock details updated', 'success');
+            loadStocks();
+        }
+
+        async function addStock() {
+            const symbol = document.getElementById('newSymbol').value.toUpperCase();
+            const name = document.getElementById('newName').value;
+            const price = parseFloat(document.getElementById('newPrice').value);
+            const res = await fetch(`/api/admin/${ADMIN_SECRET}/stock`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ symbol, name, price, volume: 1000000, market_cap: 'N/A' })
+            });
+            showAlert('stockAlert', `Stock ${symbol} added!`, 'success');
+            loadStocks();
+        }
+
+        async function addCash() {
+            const userId = document.getElementById('cashUserId').value;
+            const amount = parseFloat(document.getElementById('cashAmount').value);
+            if (!userId || !amount) return;
+            const res = await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}/cash`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount })
+            });
+            showAlert('userAlert', `Added $${amount} to user`, 'success');
+            loadUsers();
+            loadStats();
+        }
+
+        async function setExactCash() {
+            const userId = document.getElementById('cashUserId').value;
+            const amount = parseFloat(document.getElementById('cashAmount').value);
+            if (!userId || !amount) return;
+            const res = await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}/setcash`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cash: amount })
+            });
+            showAlert('userAlert', `Set user cash to $${amount}`, 'success');
+            loadUsers();
+            loadStats();
+        }
+
+        async function resetUser() {
+            const userId = document.getElementById('resetUserId').value;
+            if (!userId || !confirm('Reset this user to $100,000? This deletes all holdings.')) return;
+            const res = await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}/reset`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            showAlert('userAlert', 'User reset to $100,000', 'success');
+            loadUsers();
+            loadStats();
+        }
+
+        async function deleteUser() {
+            const userId = document.getElementById('resetUserId').value;
+            if (!userId || !confirm('PERMANENTLY DELETE this user? This cannot be undone!')) return;
+            const res = await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}`, {
+                method: 'DELETE'
+            });
+            showAlert('userAlert', 'User deleted', 'success');
+            loadUsers();
+            loadStats();
+        }
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(`${tab}Tab`).classList.add('active');
+            event.target.classList.add('active');
+            if (tab === 'users') { loadUsers(); loadStats(); }
+            if (tab === 'stocks') loadStocks();
+            if (tab === 'transactions') loadTransactions();
+        }
+
+        function showAlert(elementId, message, type) {
+            const alertDiv = document.getElementById(elementId);
+            alertDiv.textContent = message;
+            alertDiv.className = `alert ${type}`;
+            setTimeout(() => { alertDiv.className = 'alert'; }, 3000);
+        }
+
+        function refreshData() {
+            loadStats();
+            loadUsers();
+            loadStocks();
+            loadTransactions();
+            showAlert('systemAlert', 'All data refreshed', 'success');
+        }
+
+        function exportData() {
+            alert('Export feature - would download CSV of all user data');
+        }
+
+        // Initial load
+        loadStats();
+        loadUsers();
+        loadStocks();
+        loadTransactions();
+    </script>
+</body>
+</html>
