@@ -22,6 +22,10 @@ const pool = new Pool({
     ssl: { rejectUnauthorized: false }
 });
 
+// Tier capital mapping
+const TIER_CAPITAL = { 1: 1000, 2: 5000, 3: 15000 };
+const TIER_NAMES = { 1: 'Bronze', 2: 'Silver', 3: 'Gold' };
+
 async function initDB() {
     await pool.query(`
         CREATE TABLE IF NOT EXISTS users (
@@ -29,7 +33,7 @@ async function initDB() {
             username TEXT UNIQUE,
             email TEXT UNIQUE,
             password TEXT,
-            cash REAL DEFAULT 1000,
+            cash REAL DEFAULT 0,
             tier INTEGER DEFAULT 1,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -91,14 +95,15 @@ async function getStocks() {
     return result.rows;
 }
 
+// Register - starts with $0
 app.post('/api/register', async (req, res) => {
     const { username, email, password } = req.body;
     const hashed = await bcrypt.hash(password, 10);
     try {
-        await pool.query("INSERT INTO users (username, email, password, cash) VALUES ($1, $2, $3, 1000)", [username, email, hashed]);
-        res.json({ success: true });
+        await pool.query("INSERT INTO users (username, email, password, cash) VALUES ($1, $2, $3, 0)", [username, email, hashed]);
+        res.json({ success: true, message: "Account created! Please login." });
     } catch (err) {
-        res.status(400).json({ error: 'Username exists' });
+        res.status(400).json({ error: 'Username or email already exists' });
     }
 });
 
@@ -106,9 +111,9 @@ app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
     const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
     const user = result.rows[0];
-    if (!user) return res.status(401).json({ error: "Invalid" });
+    if (!user) return res.status(401).json({ error: "Invalid credentials" });
     const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(401).json({ error: "Invalid" });
+    if (!valid) return res.status(401).json({ error: "Invalid credentials" });
     req.session.userId = user.id;
     res.json({ success: true, user });
 });
@@ -129,6 +134,12 @@ app.get('/api/user', async (req, res) => {
         if (stock) portfolioValue += stock.price * p.shares;
     }
     res.json({ ...user.rows[0], portfolioValue, totalValue: user.rows[0].cash + portfolioValue });
+});
+
+app.get('/api/user-tier', async (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
+    const result = await pool.query("SELECT tier FROM users WHERE id = $1", [req.session.userId]);
+    res.json({ tier: result.rows[0]?.tier || 1, name: TIER_NAMES[result.rows[0]?.tier || 1], capital: TIER_CAPITAL[result.rows[0]?.tier || 1] });
 });
 
 app.get('/api/stocks', async (req, res) => {
@@ -217,6 +228,7 @@ app.put('/api/user/password', async (req, res) => {
     res.json({ success: true });
 });
 
+// Deposit/Withdraw redirect to email
 app.post('/api/user/add-money', (req, res) => {
     res.json({ redirect: true, email: 'kelsey@charterflow.store' });
 });
@@ -233,6 +245,7 @@ app.post('/api/verify-password', async (req, res) => {
     res.json({ valid });
 });
 
+// Admin routes
 const ADMIN_SECRET = 'ApexMaster2024';
 
 app.get('/api/admin/:secret/users', async (req, res) => {
@@ -251,17 +264,16 @@ app.post('/api/admin/:secret/user/:id/cash', async (req, res) => {
 app.post('/api/admin/:secret/user/:id/tier', async (req, res) => {
     if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
     const { tier } = req.body;
-    const cashMap = { 1: 1000, 2: 5000, 3: 15000 };
-    const newCash = cashMap[tier] || 1000;
+    const newCash = TIER_CAPITAL[tier] || 1000;
     await pool.query("UPDATE users SET tier = $1, cash = $2 WHERE id = $3", [tier, newCash, req.params.id]);
-    res.json({ success: true });
+    res.json({ success: true, newCash, tierName: TIER_NAMES[tier] });
 });
 
 app.post('/api/admin/:secret/user/:id/reset', async (req, res) => {
     if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
     const user = await pool.query("SELECT tier FROM users WHERE id = $1", [req.params.id]);
-    const cashMap = { 1: 1000, 2: 5000, 3: 15000 };
-    const newCash = cashMap[user.rows[0]?.tier || 1];
+    const tier = user.rows[0]?.tier || 1;
+    const newCash = TIER_CAPITAL[tier];
     await pool.query("DELETE FROM portfolio WHERE user_id = $1", [req.params.id]);
     await pool.query("DELETE FROM transactions WHERE user_id = $1", [req.params.id]);
     await pool.query("UPDATE users SET cash = $1 WHERE id = $2", [newCash, req.params.id]);
@@ -284,29 +296,41 @@ app.get('/api/admin/:secret/stocks', async (req, res) => {
 
 app.post('/api/admin/:secret/stock/update', async (req, res) => {
     if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
-    const { oldSymbol, newSymbol, name, price } = req.body;
-    await pool.query("UPDATE stocks SET symbol = $1, name = $2, price = $3 WHERE symbol = $4", [newSymbol, name, price, oldSymbol]);
-    res.json({ success: true });
+    const { symbol, name, price } = req.body;
+    await pool.query("UPDATE stocks SET name = $1, price = $2 WHERE symbol = $3", [name, price, symbol]);
+    res.json({ success: true, message: "Stock updated" });
 });
 
 app.post('/api/admin/:secret/stock/add', async (req, res) => {
     if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
     const { symbol, name, price } = req.body;
     await pool.query("INSERT INTO stocks (symbol, name, price) VALUES ($1, $2, $3)", [symbol.toUpperCase(), name, price]);
-    res.json({ success: true });
+    res.json({ success: true, message: "Stock added" });
 });
 
 app.post('/api/admin/:secret/stock/delete', async (req, res) => {
     if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
     const { symbol } = req.body;
     await pool.query("DELETE FROM stocks WHERE symbol = $1", [symbol]);
-    res.json({ success: true });
+    res.json({ success: true, message: "Stock deleted" });
 });
 
 app.get('/api/admin/:secret/transactions', async (req, res) => {
     if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
     const result = await pool.query("SELECT t.*, u.username FROM transactions t JOIN users u ON t.user_id = u.id ORDER BY date DESC LIMIT 200");
     res.json(result.rows);
+});
+
+app.get('/api/admin/:secret/stats', async (req, res) => {
+    if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
+    const userStats = await pool.query("SELECT COUNT(*) as totalUsers, SUM(cash) as totalCash FROM users");
+    const tradeStats = await pool.query("SELECT COUNT(*) as totalTrades FROM transactions");
+    res.json({
+        totalUsers: parseInt(userStats.rows[0].totalusers) || 0,
+        totalCash: parseFloat(userStats.rows[0].totalcash) || 0,
+        totalTrades: parseInt(tradeStats.rows[0].totaltrades) || 0,
+        totalPortfolioValue: 0
+    });
 });
 
 app.get('/', (req, res) => {
