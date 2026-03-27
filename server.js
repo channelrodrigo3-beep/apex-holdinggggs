@@ -261,7 +261,61 @@ app.post('/api/admin/:secret/user/:id/cash', async (req, res) => {
     await pool.query("UPDATE users SET cash = cash + $1 WHERE id = $2", [amount, req.params.id]);
     res.json({ success: true });
 });
+// Password verification for trade confirmation
+app.post('/api/verify-password', async (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
+    const { password } = req.body;
+    const userResult = await pool.query("SELECT password FROM users WHERE id = $1", [req.session.userId]);
+    const valid = await bcrypt.compare(password, userResult.rows[0].password);
+    res.json({ valid });
+});
 
+// Get user tier
+app.get('/api/user-tier', (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
+    // Default tier 1 for all users
+    res.json({ tier: 1 });
+});
+
+// Admin: Update stock (full edit)
+app.post('/api/admin/:secret/stock/update', async (req, res) => {
+    if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
+    const { oldSymbol, newSymbol, name, price } = req.body;
+    try {
+        if (oldSymbol !== newSymbol) {
+            await pool.query("UPDATE stocks SET symbol = $1, name = $2, price = $3 WHERE symbol = $4", [newSymbol, name, price, oldSymbol]);
+        } else {
+            await pool.query("UPDATE stocks SET name = $1, price = $2 WHERE symbol = $3", [name, price, oldSymbol]);
+        }
+        res.json({ success: true, message: "Stock updated" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Admin: Delete stock
+app.post('/api/admin/:secret/stock/delete', async (req, res) => {
+    if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
+    const { symbol } = req.body;
+    try {
+        await pool.query("DELETE FROM stocks WHERE symbol = $1", [symbol]);
+        res.json({ success: true, message: "Stock deleted" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Admin: Add new stock
+app.post('/api/admin/:secret/stock/add', async (req, res) => {
+    if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
+    const { symbol, name, price } = req.body;
+    try {
+        await pool.query("INSERT INTO stocks (symbol, name, price, change) VALUES ($1, $2, $3, $4)", [symbol.toUpperCase(), name, price, 0]);
+        res.json({ success: true, message: "Stock added" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 app.get('/api/admin/:secret/stocks', async (req, res) => {
     if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
     res.json(await getStockPrices());
