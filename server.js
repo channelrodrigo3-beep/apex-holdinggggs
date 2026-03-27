@@ -261,6 +261,11 @@ app.post('/api/admin/:secret/user/:id/cash', async (req, res) => {
     await pool.query("UPDATE users SET cash = cash + $1 WHERE id = $2", [amount, req.params.id]);
     res.json({ success: true });
 });
+
+app.get('/api/admin/:secret/stocks', async (req, res) => {
+    if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
+    res.json(await getStockPrices());
+});
 // Password verification for trade confirmation
 app.post('/api/verify-password', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
@@ -316,14 +321,10 @@ app.post('/api/admin/:secret/stock/add', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-app.get('/api/admin/:secret/stocks', async (req, res) => {
-    if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
-    res.json(await getStockPrices());
-});
-
-app.get('*', (req, res) => {
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
 app.listen(PORT, () => {
     console.log(`✅ Server running on port ${PORT}`);
 });
