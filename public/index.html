@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>Apex Holdings - Institutional Trading Platform</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -19,20 +19,7 @@
             overflow-x: hidden;
         }
 
-        /* Mobile-first responsive */
-        @media (max-width: 768px) {
-            .container { padding: 0 1rem; }
-            .stats-grid { grid-template-columns: 1fr !important; gap: 1rem !important; }
-            .profile-header { flex-direction: column; text-align: center; }
-            .info-grid { grid-template-columns: 1fr !important; }
-            .card { padding: 1rem !important; }
-            .navbar { padding: 0.8rem 1rem !important; }
-            .nav-links { gap: 0.8rem !important; }
-            .nav-links a, .nav-links button { font-size: 0.8rem !important; padding: 0.3rem 0.8rem !important; }
-            .hero h1 { font-size: 2rem !important; }
-            .tier-grid { grid-template-columns: 1fr !important; }
-        }
-
+        /* Background */
         .bg-grid {
             position: fixed;
             top: 0;
@@ -50,9 +37,7 @@
             height: 200%;
             top: -50%;
             left: -50%;
-            background-image: 
-                linear-gradient(rgba(0, 255, 100, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 100, 0.03) 1px, transparent 1px);
+            background-image: linear-gradient(rgba(0, 255, 100, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 100, 0.03) 1px, transparent 1px);
             background-size: 40px 40px;
             animation: moveGrid 30s linear infinite;
         }
@@ -62,11 +47,12 @@
             100% { transform: translate(40px, 40px); }
         }
 
+        /* Navbar */
         .navbar {
             background: rgba(10, 12, 16, 0.95);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(0, 255, 100, 0.2);
-            padding: 0.8rem 2rem;
+            padding: 0.8rem 1rem;
             position: fixed;
             width: 100%;
             top: 0;
@@ -82,72 +68,105 @@
         }
 
         .logo {
-            font-size: 1.6rem;
+            font-size: 1.3rem;
             font-weight: 800;
             background: linear-gradient(135deg, #00ff88, #0066ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .logo-icon {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             background: linear-gradient(135deg, #00ff88, #0066ff);
-            border-radius: 8px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 14px;
             color: #0a0c10;
             -webkit-text-fill-color: #0a0c10;
         }
 
-        .logo span {
-            font-size: 0.7rem;
-            background: rgba(0,255,100,0.2);
-            -webkit-text-fill-color: #00ff88;
-            padding: 2px 8px;
-            border-radius: 20px;
-            margin-left: 8px;
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 2px;
+            background: #00ff88;
+            transition: 0.3s;
         }
 
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 1.5rem;
             align-items: center;
+            transition: 0.3s;
         }
 
-        .nav-links a {
+        .nav-links a, .nav-links button {
             color: #8e9aaf;
             text-decoration: none;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 500;
             transition: all 0.3s;
+            background: none;
+            border: none;
         }
 
-        .nav-links a:hover {
+        .nav-links a:hover, .nav-links button:hover {
             color: #00ff88;
         }
 
         .nav-links button {
             background: linear-gradient(135deg, #00ff88, #00cc66);
-            padding: 0.5rem 1.2rem;
-            border: none;
-            border-radius: 8px;
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
             color: #0a0c10;
             font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
         }
 
+        @media (max-width: 768px) {
+            .hamburger { display: flex; }
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: 70%;
+                background: rgba(10, 12, 16, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                justify-content: center;
+                padding: 2rem;
+                gap: 1.5rem;
+                transition: 0.3s;
+                border-left: 1px solid rgba(0,255,100,0.2);
+            }
+            .nav-links.active {
+                right: 0;
+            }
+            .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+            .hamburger.active span:nth-child(2) { opacity: 0; }
+            .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+        }
+
+        /* Sections */
         .section {
             display: none;
-            padding: 6rem 2rem 2rem;
+            padding: 5rem 1rem 2rem;
             min-height: 100vh;
         }
 
@@ -156,68 +175,73 @@
         }
 
         .container {
-            max-width: 1600px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
+        /* Cards */
         .card {
             background: rgba(16, 18, 22, 0.9);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(0, 255, 100, 0.1);
             border-radius: 20px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            transition: all 0.3s;
+            padding: 1.2rem;
+            margin-bottom: 1.2rem;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+        }
+
+        @media (min-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(4, 1fr); }
+            .container { padding: 0 1rem; }
+            .card { padding: 1.5rem; }
         }
 
         .stat-card {
             background: linear-gradient(135deg, rgba(0, 255, 100, 0.05), rgba(0, 102, 255, 0.05));
             border: 1px solid rgba(0, 255, 100, 0.15);
-            border-radius: 20px;
-            padding: 1.5rem;
+            border-radius: 16px;
+            padding: 1rem;
+            text-align: center;
         }
 
         .stat-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
             color: #8e9aaf;
         }
 
         .stat-value {
-            font-size: 2rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: #00ff88;
         }
 
-        /* Tier Cards */
+        /* Tiers */
         .tier-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
+            grid-template-columns: 1fr;
+            gap: 1rem;
             margin-top: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .tier-grid { grid-template-columns: repeat(3, 1fr); }
         }
 
         .tier-card {
             background: linear-gradient(135deg, rgba(0, 255, 100, 0.05), rgba(0, 102, 255, 0.05));
             border: 1px solid rgba(0, 255, 100, 0.2);
-            border-radius: 20px;
-            padding: 1.5rem;
+            border-radius: 16px;
+            padding: 1rem;
             text-align: center;
-            transition: all 0.3s;
             cursor: pointer;
-        }
-
-        .tier-card:hover {
-            transform: translateY(-5px);
-            border-color: #00ff88;
+            transition: 0.3s;
         }
 
         .tier-card.current {
@@ -225,29 +249,17 @@
             background: linear-gradient(135deg, rgba(0, 255, 100, 0.15), rgba(0, 102, 255, 0.15));
         }
 
-        .tier-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #00ff88;
-            margin-bottom: 0.5rem;
-        }
-
-        .tier-benefits {
-            font-size: 0.8rem;
-            color: #8e9aaf;
-            margin: 1rem 0;
-            line-height: 1.5;
-        }
-
+        .tier-name { font-size: 1.2rem; font-weight: 700; color: #00ff88; }
+        .tier-benefits { font-size: 0.7rem; color: #8e9aaf; margin: 0.5rem 0; }
         .upgrade-btn {
             background: linear-gradient(135deg, #00ff88, #00cc66);
-            border: none;
-            padding: 0.5rem 1rem;
+            padding: 0.3rem 1rem;
             border-radius: 20px;
             color: #0a0c10;
             font-weight: 600;
+            font-size: 0.7rem;
             cursor: pointer;
-            font-size: 0.8rem;
+            display: inline-block;
         }
 
         /* Loading Overlay */
@@ -267,10 +279,10 @@
         }
 
         .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(0, 255, 136, 0.2);
-            border-top: 4px solid #00ff88;
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 255, 136, 0.2);
+            border-top: 3px solid #00ff88;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -280,13 +292,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        .loading-text {
-            margin-top: 1rem;
-            color: #00ff88;
-            font-size: 1rem;
-        }
-
-        /* Confirmation Modal */
+        /* Modal */
         .modal {
             position: fixed;
             top: 0;
@@ -304,22 +310,11 @@
         .modal-content {
             background: rgba(20, 22, 27, 0.95);
             border: 1px solid rgba(0, 255, 136, 0.3);
-            border-radius: 24px;
-            padding: 2rem;
-            max-width: 400px;
+            border-radius: 20px;
+            padding: 1.5rem;
             width: 90%;
+            max-width: 350px;
             text-align: center;
-            transform: scale(0.9);
-            transition: transform 0.3s;
-        }
-
-        .modal.show .modal-content {
-            transform: scale(1);
-        }
-
-        .modal h3 {
-            color: #00ff88;
-            margin-bottom: 1rem;
         }
 
         .modal input {
@@ -328,145 +323,11 @@
             margin: 1rem 0;
             background: #1a1c22;
             border: 1px solid rgba(0,255,100,0.2);
-            border-radius: 12px;
-            color: white;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-
-        /* Profile */
-        .profile-header {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid rgba(0, 255, 100, 0.1);
-        }
-
-        .avatar {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #00ff88, #0066ff);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #0a0c10;
-        }
-
-        .profile-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .profile-stat-box {
-            background: rgba(0, 255, 100, 0.05);
-            border-radius: 16px;
-            padding: 1rem;
-            text-align: center;
-        }
-
-        .stock-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .stock-table th, .stock-table td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .stock-table th {
-            color: #00ff88;
-        }
-
-        .price-up { color: #00ff88; }
-        .price-down { color: #ff3b30; }
-
-        .trade-input {
-            background: #1a1c22;
-            border: 1px solid rgba(0,255,100,0.2);
-            border-radius: 8px;
-            padding: 0.5rem;
-            color: white;
-            width: 100px;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #00ff88, #00cc66);
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
-            color: #0a0c10;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #ff3b30, #cc2f24);
-            color: white;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid #00ff88;
-            color: #00ff88;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.8rem;
-            background: #1a1c22;
-            border: 1px solid rgba(0,255,100,0.2);
             border-radius: 10px;
             color: white;
         }
 
-        .alert {
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            display: none;
-        }
-
-        .alert.success {
-            background: rgba(0,255,100,0.1);
-            border: 1px solid #00ff88;
-            color: #00ff88;
-            display: block;
-        }
-
-        .alert.error {
-            background: rgba(255,59,48,0.1);
-            border: 1px solid #ff3b30;
-            color: #ff3b30;
-            display: block;
-        }
-
-        .auth-container {
-            max-width: 450px;
-            margin: 8rem auto;
-            background: rgba(16, 18, 22, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 255, 100, 0.2);
-            border-radius: 32px;
-            padding: 2.5rem;
-        }
-
+        /* Hero */
         .hero {
             min-height: 100vh;
             display: flex;
@@ -476,96 +337,94 @@
             padding: 2rem;
         }
 
-        .hero h1 {
-            font-size: 4rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ffffff, #00ff88);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .hero h1 { font-size: 2rem; background: linear-gradient(135deg, #fff, #00ff88); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { color: #8e9aaf; margin: 1rem 0; }
 
-        .cta-button {
-            background: linear-gradient(135deg, #00ff88, #00cc66);
-            padding: 1rem 2.5rem;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 1rem;
-        }
-
-        /* Team Section */
-        .team-grid {
+        /* Landing Page Sections */
+        .features-grid, .team-grid, .stats-showcase {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
         }
 
-        .team-card {
+        @media (min-width: 768px) {
+            .features-grid, .team-grid, .stats-showcase { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .feature-card, .team-card, .stat-showcase {
             background: rgba(16, 18, 22, 0.9);
             border: 1px solid rgba(0, 255, 100, 0.1);
-            border-radius: 20px;
-            padding: 1.5rem;
+            border-radius: 16px;
+            padding: 1.2rem;
             text-align: center;
-            transition: all 0.3s;
-        }
-
-        .team-card:hover {
-            transform: translateY(-5px);
-            border-color: #00ff88;
         }
 
         .team-avatar {
-            width: 100px;
-            height: 100px;
+            width: 70px;
+            height: 70px;
             background: linear-gradient(135deg, #00ff88, #0066ff);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 2rem;
+            margin: 0 auto 0.8rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: #0a0c10;
         }
 
-        .team-name {
-            font-size: 1.2rem;
+        .btn {
+            background: linear-gradient(135deg, #00ff88, #00cc66);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
             font-weight: 600;
-            margin-bottom: 0.5rem;
+            cursor: pointer;
         }
 
-        .team-title {
-            color: #00ff88;
-            font-size: 0.85rem;
-            margin-bottom: 0.5rem;
+        .btn-danger { background: linear-gradient(135deg, #ff3b30, #cc2f24); color: white; }
+        .trade-input {
+            background: #1a1c22;
+            border: 1px solid rgba(0,255,100,0.2);
+            border-radius: 8px;
+            padding: 0.4rem;
+            color: white;
+            width: 80px;
         }
 
-        .team-bio {
-            color: #8e9aaf;
-            font-size: 0.8rem;
-            line-height: 1.4;
+        .stock-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        .stock-table th, .stock-table td { padding: 0.5rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .price-up { color: #00ff88; }
+        .price-down { color: #ff3b30; }
+
+        .form-group { margin-bottom: 0.8rem; }
+        .form-group input {
+            width: 100%;
+            padding: 0.7rem;
+            background: #1a1c22;
+            border: 1px solid rgba(0,255,100,0.2);
+            border-radius: 10px;
+            color: white;
         }
 
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
+        .auth-container {
+            max-width: 400px;
+            margin: 5rem auto;
+            background: rgba(16, 18, 22, 0.95);
+            border: 1px solid rgba(0, 255, 100, 0.2);
+            border-radius: 24px;
+            padding: 1.5rem;
         }
 
-        .info-card {
-            background: rgba(16, 18, 22, 0.9);
-            border: 1px solid rgba(0, 255, 100, 0.1);
-            border-radius: 20px;
-            padding: 2rem;
-        }
-
-        .info-card h3 {
-            color: #00ff88;
+        .alert {
+            padding: 0.8rem;
+            border-radius: 8px;
             margin-bottom: 1rem;
+            display: none;
         }
+        .alert.success { background: rgba(0,255,100,0.1); border: 1px solid #00ff88; color: #00ff88; display: block; }
+        .alert.error { background: rgba(255,59,48,0.1); border: 1px solid #ff3b30; color: #ff3b30; display: block; }
     </style>
 </head>
 <body>
@@ -574,16 +433,14 @@
 
 <nav class="navbar">
     <div class="nav-container">
-        <div class="logo">
-            <div class="logo-icon">A</div>
-            APEX<span>HOLDINGS</span>
-        </div>
-        <div class="nav-links" id="navLinks" style="display: none;">
+        <div class="logo"><div class="logo-icon">A</div>APEX</div>
+        <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+        <div class="nav-links" id="navLinks">
             <a onclick="showSection('dashboard')">Dashboard</a>
             <a onclick="showSection('trade')">Trade</a>
             <a onclick="showSection('portfolio')">Portfolio</a>
             <a onclick="showSection('profile')">Profile</a>
-            <a onclick="showSection('info')">About</a>
+            <a onclick="showSection('landing')">About</a>
             <button onclick="logout()">Exit</button>
         </div>
         <div class="nav-links" id="authLinks">
@@ -593,711 +450,234 @@
     </div>
 </nav>
 
-<!-- Loading Overlay -->
-<div id="loadingOverlay" class="loading-overlay">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">Loading your portfolio...</div>
-</div>
+<div id="loadingOverlay" class="loading-overlay"><div class="loading-spinner"></div><div class="loading-text">Loading...</div></div>
+<div id="confirmModal" class="modal"><div class="modal-content"><h3 id="modalTitle">Confirm</h3><p id="modalMessage"></p><input type="password" id="modalPassword" placeholder="Enter password"><div class="modal-buttons"><button class="btn" onclick="confirmTrade()">Confirm</button><button class="btn-danger" onclick="closeModal()">Cancel</button></div></div></div>
 
-<!-- Confirmation Modal -->
-<div id="confirmModal" class="modal">
-    <div class="modal-content">
-        <h3 id="modalTitle">Confirm Trade</h3>
-        <p id="modalMessage">Are you sure you want to proceed?</p>
-        <input type="password" id="modalPassword" placeholder="Enter your password to confirm">
-        <div class="modal-buttons">
-            <button class="btn" onclick="confirmTrade()">Confirm</button>
-            <button class="btn-danger" onclick="closeModal()">Cancel</button>
+<!-- Landing Page -->
+<div id="landingSection" class="section active">
+    <div class="hero"><div><h1>Trade Like an Institution</h1><p>Professional-grade stock simulation • Zero risk • Learn to trade</p><button class="btn" onclick="showAuth('register')">Start Trading →</button></div></div>
+    
+    <div class="container">
+        <div class="stats-showcase">
+            <div class="stat-showcase"><div class="stat-value" style="font-size:2rem;">500K+</div><div class="stat-label">Active Traders</div></div>
+            <div class="stat-showcase"><div class="stat-value" style="font-size:2rem;">$100M+</div><div class="stat-label">Virtual Volume</div></div>
+            <div class="stat-showcase"><div class="stat-value" style="font-size:2rem;">24/7</div><div class="stat-label">Market Access</div></div>
         </div>
-    </div>
-</div>
 
-<!-- Hero / Landing Page -->
-<div id="heroSection">
-    <div class="hero">
-        <div>
-            <h1>Trade Like an Institution</h1>
-            <p>Professional-grade stock simulation • $100,000 virtual capital • Zero risk</p>
-            <button class="cta-button" onclick="showAuth('register')">Start Trading →</button>
-        </div>
+        <div class="card"><h2>Why Trade With Apex?</h2><div class="features-grid"><div class="feature-card">📊 <strong>Real-time Data</strong><br>Live market prices</div><div class="feature-card">💰 <strong>$0 Starting Capital</strong><br>Deposit to start</div><div class="feature-card">🏆 <strong>Tier System</strong><br>Bronze → Silver → Gold</div><div class="feature-card">🔒 <strong>Secure</strong><br>Password-protected trades</div><div class="feature-card">📱 <strong>Mobile Ready</strong><br>Trade anywhere</div><div class="feature-card">👥 <strong>Expert Support</strong><br>Email support</div></div></div>
+
+        <div class="card"><h2>Our Leadership</h2><div class="team-grid"><div class="team-card"><div class="team-avatar">MK</div><div class="team-name">Marcus Kelsey</div><div class="team-title">CEO & Founder</div><div class="team-bio">Former Goldman Sachs VP, 15+ years experience</div></div><div class="team-card"><div class="team-avatar">SR</div><div class="team-name">Sarah Rodriguez</div><div class="team-title">CTO</div><div class="team-bio">Ex-Microsoft, trading systems architect</div></div><div class="team-card"><div class="team-avatar">JC</div><div class="team-name">James Chen</div><div class="team-title">Head of Education</div><div class="team-bio">CFA instructor, author</div></div></div></div>
+
+        <div class="card"><h2>Our History</h2><p><strong>2018</strong> - Founded in NYC<br><strong>2020</strong> - 50K users during market volatility<br><strong>2024</strong> - 500K users globally<br><strong>Today</strong> - Trusted by educators worldwide</p></div>
+        <div class="card"><h2>Contact Support</h2><p>Email: kelsey@charterflow.store<br>Hours: 24/7 Support</p></div>
     </div>
 </div>
 
 <!-- Dashboard -->
-<div id="dashboardSection" class="section">
-    <div class="container">
-        <div class="stats-grid">
-            <div class="stat-card"><div class="stat-label">Cash Balance</div><div class="stat-value" id="cashBalance">$0</div></div>
-            <div class="stat-card"><div class="stat-label">Portfolio Value</div><div class="stat-value" id="portfolioValue">$0</div></div>
-            <div class="stat-card"><div class="stat-label">Total Net Worth</div><div class="stat-value" id="totalValue">$0</div></div>
-            <div class="stat-card"><div class="stat-label">Today's Change</div><div class="stat-value" id="dailyChange">$0</div></div>
-        </div>
-
-        <!-- Cash Management -->
-        <div class="card">
-            <h2>💰 Cash Management</h2>
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                <div style="flex: 1;">
-                    <input type="number" id="cashAmount" placeholder="Enter amount" style="background:#1a1c22; border:1px solid rgba(0,255,100,0.2); border-radius:12px; padding:0.8rem; color:white; width:100%;">
-                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                        <button class="btn" style="flex:1;" onclick="addMoney()">+ Add Money</button>
-                        <button class="btn-danger" style="flex:1;" onclick="withdrawMoney()">- Withdraw</button>
-                    </div>
-                </div>
-                <div style="flex:1; background:rgba(0,255,100,0.05); border-radius:12px; padding:1rem;">
-                    <div style="font-size:0.75rem; color:#8e9aaf;">AVAILABLE CASH</div>
-                    <div style="font-size:1.5rem; font-weight:bold; color:#00ff88;" id="availableCash">$0</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tiers Section -->
-        <div class="card">
-            <h2>🏆 Account Tiers</h2>
-            <div class="tier-grid" id="tierGrid">
-                <div class="tier-card" data-tier="1" onclick="upgradeTier(1)">
-                    <div class="tier-name">⚡ BRONZE</div>
-                    <div class="tier-benefits">• $100,000 starting capital<br>• Basic market access<br>• Standard support</div>
-                    <div id="tier1Badge" class="upgrade-btn" style="background:#8e9aaf;">Current Tier</div>
-                </div>
-                <div class="tier-card" data-tier="2" onclick="upgradeTier(2)">
-                    <div class="tier-name">🔥 SILVER</div>
-                    <div class="tier-benefits">• $500,000 capital<br>• Advanced charts<br>• Priority support<br>• 2x margin</div>
-                    <div id="tier2Badge" class="upgrade-btn">Upgrade</div>
-                </div>
-                <div class="tier-card" data-tier="3" onclick="upgradeTier(3)">
-                    <div class="tier-name">💎 GOLD</div>
-                    <div class="tier-benefits">• $1,000,000 capital<br>• Institutional tools<br>• 24/7 dedicated support<br>• 5x margin</div>
-                    <div id="tier3Badge" class="upgrade-btn">Upgrade</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>📊 Market Overview</h2>
-            <div id="marketData"></div>
-        </div>
-    </div>
-</div>
+<div id="dashboardSection" class="section"><div class="container">
+    <div class="stats-grid"><div class="stat-card"><div class="stat-label">Cash</div><div class="stat-value" id="cashBalance">$0</div></div><div class="stat-card"><div class="stat-label">Portfolio</div><div class="stat-value" id="portfolioValue">$0</div></div><div class="stat-card"><div class="stat-label">Net Worth</div><div class="stat-value" id="totalValue">$0</div></div><div class="stat-card"><div class="stat-label">Today's Change</div><div class="stat-value" id="dailyChange">$0</div></div></div>
+    <div class="card"><h2>💰 Cash Management</h2><div style="display:flex; gap:0.5rem; flex-wrap:wrap;"><div style="flex:1"><input type="number" id="cashAmount" placeholder="Amount" style="width:100%; padding:0.6rem; background:#1a1c22; border:1px solid rgba(0,255,100,0.2); border-radius:8px; color:white;"><div style="display:flex; gap:0.5rem; margin-top:0.5rem;"><button class="btn" style="flex:1" onclick="requestDeposit()">+ Deposit</button><button class="btn-danger" style="flex:1" onclick="requestWithdraw()">- Withdraw</button></div></div><div style="flex:1; background:rgba(0,255,100,0.05); border-radius:12px; padding:0.8rem;"><div style="font-size:0.7rem;">AVAILABLE CASH</div><div style="font-size:1.2rem; font-weight:bold; color:#00ff88;" id="availableCash">$0</div></div></div></div>
+    <div class="card"><h2>🏆 Account Tiers</h2><div class="tier-grid" id="tierGrid"><div class="tier-card" data-tier="1"><div class="tier-name">🥉 Bronze</div><div class="tier-benefits">$1,000 capital • Basic access</div><div id="tier1Badge" class="upgrade-btn">Current</div></div><div class="tier-card" data-tier="2"><div class="tier-name">🥈 Silver</div><div class="tier-benefits">$5,000 capital • Priority support</div><div id="tier2Badge" class="upgrade-btn">Upgrade</div></div><div class="tier-card" data-tier="3"><div class="tier-name">🥇 Gold</div><div class="tier-benefits">$15,000 capital • Dedicated support</div><div id="tier3Badge" class="upgrade-btn">Upgrade</div></div></div></div>
+    <div class="card"><h2>📊 Market Overview</h2><div id="marketData"></div></div>
+</div></div>
 
 <!-- Trade -->
-<div id="tradeSection" class="section">
-    <div class="container">
-        <div class="card">
-            <h2>💹 Execute Trades</h2>
-            <div id="tradeAlert" class="alert"></div>
-            <div id="tradeStocks"></div>
-        </div>
-    </div>
-</div>
+<div id="tradeSection" class="section"><div class="container"><div class="card"><h2>💹 Execute Trades</h2><div id="tradeAlert" class="alert"></div><div id="tradeStocks"></div></div></div></div>
 
 <!-- Portfolio -->
-<div id="portfolioSection" class="section">
-    <div class="container">
-        <div class="card">
-            <h2>📋 Your Holdings</h2>
-            <div id="portfolioList"></div>
-        </div>
-        <div class="card">
-            <h2>🕒 Recent Transactions</h2>
-            <div id="transactionsList"></div>
-        </div>
-    </div>
-</div>
+<div id="portfolioSection" class="section"><div class="container"><div class="card"><h2>📋 Your Holdings</h2><div id="portfolioList"></div></div><div class="card"><h2>🕒 Recent Transactions</h2><div id="transactionsList"></div></div></div></div>
 
 <!-- Profile -->
-<div id="profileSection" class="section">
-    <div class="container">
-        <div class="card">
-            <div class="profile-header">
-                <div class="avatar" id="userAvatar">JD</div>
-                <div class="profile-info">
-                    <h2 id="profileDisplayName">John Doe</h2>
-                    <p id="profileEmailDisplay">john@example.com</p>
-                    <p>Member since <span id="memberSince">January 2024</span></p>
-                    <p>Account Tier: <strong id="profileTier">Bronze</strong></p>
-                </div>
-            </div>
+<div id="profileSection" class="section"><div class="container"><div class="card"><div style="text-align:center"><div class="avatar" id="userAvatar" style="width:70px; height:70px; background:linear-gradient(135deg,#00ff88,#0066ff); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; font-size:1.5rem;">JD</div><h2 id="profileDisplayName"></h2><p id="profileEmailDisplay"></p><p>Account Tier: <strong id="profileTier">Bronze</strong></p></div><div class="stats-grid" style="margin-top:1rem"><div class="stat-card"><div class="stat-label">Trades</div><div class="stat-value" id="statTrades">0</div></div><div class="stat-card"><div class="stat-label">Holdings</div><div class="stat-value" id="statHoldings">0</div></div><div class="stat-card"><div class="stat-label">Cash</div><div class="stat-value" id="profileCash">$0</div></div><div class="stat-card"><div class="stat-label">Net Worth</div><div class="stat-value" id="profileNetWorth">$0</div></div></div><div class="card" style="margin-top:1rem"><h3>Edit Profile</h3><div id="profileAlert" class="alert"></div><div class="form-group"><input type="text" id="profileUsername" placeholder="Username"></div><div class="form-group"><input type="email" id="profileEmail" placeholder="Email"></div><button class="btn" onclick="updateProfile()">Save</button></div><div class="card"><h3>Change Password</h3><div class="form-group"><input type="password" id="currentPassword" placeholder="Current password"></div><div class="form-group"><input type="password" id="newPassword" placeholder="New password"></div><div class="form-group"><input type="password" id="confirmPassword" placeholder="Confirm"></div><button class="btn" onclick="changePassword()">Update Password</button></div></div></div></div>
 
-            <div class="profile-stats">
-                <div class="profile-stat-box">
-                    <div class="profile-stat-number" id="statTrades">0</div>
-                    <div class="profile-stat-label">Total Trades</div>
-                </div>
-                <div class="profile-stat-box">
-                    <div class="profile-stat-number" id="statHoldings">0</div>
-                    <div class="profile-stat-label">Holdings</div>
-                </div>
-                <div class="profile-stat-box">
-                    <div class="profile-stat-number" id="statAccountAge">0</div>
-                    <div class="profile-stat-label">Days Active</div>
-                </div>
-            </div>
+<!-- Auth -->
+<div id="authSection" style="display:none"><div id="loginForm" class="auth-container"><h2>Welcome Back</h2><div id="loginAlert" class="alert"></div><div class="form-group"><input type="text" id="loginUsername" placeholder="Username"></div><div class="form-group"><input type="password" id="loginPassword" placeholder="Password"></div><button class="btn" style="width:100%" onclick="login()">Sign In</button><p style="margin-top:1rem; text-align:center;">No account? <a onclick="showAuth('register')" style="color:#00ff88">Create one</a></p></div><div id="registerForm" class="auth-container" style="display:none"><h2>Create Account</h2><div id="registerAlert" class="alert"></div><div class="form-group"><input type="text" id="regUsername" placeholder="Username"></div><div class="form-group"><input type="email" id="regEmail" placeholder="Email"></div><div class="form-group"><input type="password" id="regPassword" placeholder="Password"></div><button class="btn" style="width:100%" onclick="register()">Get Started</button><p style="margin-top:1rem; text-align:center;">Have an account? <a onclick="showAuth('login')" style="color:#00ff88">Sign in</a></p></div></div>
 
-            <div class="settings-section" style="background:rgba(26,28,34,0.5); border-radius:16px; padding:1.5rem; margin-bottom:1.5rem;">
-                <h3>📝 Personal Information</h3>
-                <div id="profileAlert" class="alert"></div>
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="profileUsername">
-                </div>
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" id="profileEmail">
-                </div>
-                <button class="btn" onclick="updateProfile()">Save Changes</button>
-            </div>
-
-            <div class="settings-section" style="background:rgba(26,28,34,0.5); border-radius:16px; padding:1.5rem; margin-bottom:1.5rem;">
-                <h3>🔐 Security</h3>
-                <div class="form-group">
-                    <label>Current Password</label>
-                    <input type="password" id="currentPassword">
-                </div>
-                <div class="form-group">
-                    <label>New Password</label>
-                    <input type="password" id="newPassword">
-                </div>
-                <div class="form-group">
-                    <label>Confirm New Password</label>
-                    <input type="password" id="confirmPassword">
-                </div>
-                <button class="btn" onclick="changePassword()">Update Password</button>
-            </div>
-
-            <div class="settings-section" style="background:rgba(26,28,34,0.5); border-radius:16px; padding:1.5rem;">
-                <h3>📊 Account Summary</h3>
-                <div class="profile-stats" style="margin-bottom: 0;">
-                    <div class="profile-stat-box">
-                        <div class="profile-stat-number" id="profileCash">$0</div>
-                        <div class="profile-stat-label">Available Cash</div>
-                    </div>
-                    <div class="profile-stat-box">
-                        <div class="profile-stat-number" id="profilePortfolio">$0</div>
-                        <div class="profile-stat-label">Portfolio Value</div>
-                    </div>
-                    <div class="profile-stat-box">
-                        <div class="profile-stat-number" id="profileNetWorth">$0</div>
-                        <div class="profile-stat-label">Net Worth</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- About/Company Section (Landing Page) -->
-<div id="infoSection" class="section">
-    <div class="container">
-        <div class="card">
-            <h2>🏛️ About Apex Holdings</h2>
-            <p style="margin-top: 1rem; line-height: 1.6;">Founded in 2018, Apex Holdings has grown from a small fintech startup to one of the most trusted names in stock market education. With over 500,000 users worldwide, we've helped aspiring traders learn the ropes without risking real capital.</p>
-            <p style="margin-top: 1rem; line-height: 1.6;">Our mission is simple: democratize financial education. We believe everyone should have access to professional-grade trading tools to learn, practice, and build confidence before entering real markets.</p>
-        </div>
-
-        <div class="card">
-            <h2>👥 Our Leadership Team</h2>
-            <div class="team-grid">
-                <div class="team-card">
-                    <div class="team-avatar">MK</div>
-                    <div class="team-name">Marcus Kelsey</div>
-                    <div class="team-title">CEO & Founder</div>
-                    <div class="team-bio">Former Goldman Sachs VP with 15+ years in institutional trading. Founded Apex to bridge the gap between education and real-world trading.</div>
-                </div>
-                <div class="team-card">
-                    <div class="team-avatar">SR</div>
-                    <div class="team-name">Sarah Rodriguez</div>
-                    <div class="team-title">Chief Technology Officer</div>
-                    <div class="team-bio">Ex-Microsoft engineer, built trading systems for hedge funds. Leads our platform architecture and innovation.</div>
-                </div>
-                <div class="team-card">
-                    <div class="team-avatar">JD</div>
-                    <div class="team-name">James Chen</div>
-                    <div class="team-title">Head of Education</div>
-                    <div class="team-bio">Former CFA instructor, author of "The Modern Trader". Passionate about making complex financial concepts accessible.</div>
-                </div>
-                <div class="team-card">
-                    <div class="team-avatar">EL</div>
-                    <div class="team-name">Elena Volkov</div>
-                    <div class="team-title">Director of Research</div>
-                    <div class="team-bio">PhD in Financial Economics, previously at Bloomberg. Leads our market analysis and educational content.</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>📍 Our History</h2>
-            <div style="margin-top: 1rem;">
-                <p><strong>2018</strong> - Apex Holdings founded in New York City with just 3 employees</p>
-                <p><strong>2019</strong> - Launched our first stock simulation with 1,000 beta users</p>
-                <p><strong>2020</strong> - Reached 50,000 users during market volatility spike</p>
-                <p><strong>2022</strong> - Expanded to international markets, added 10 new exchanges</p>
-                <p><strong>2024</strong> - Surpassed 500,000 users, launched institutional-grade platform</p>
-                <p><strong>Today</strong> - Trusted by educators, universities, and aspiring traders worldwide</p>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>📞 Contact & Support</h2>
-            <p><strong>Email:</strong> support@apexholdings.com</p>
-            <p><strong>Phone:</strong> +1 (888) 555-APEX</p>
-            <p><strong>Address:</strong> 200 Liberty Street, New York, NY 10281</p>
-            <p><strong>Hours:</strong> Monday-Friday 9am-8pm EST | Live Chat 24/7</p>
-            <p><strong>Social:</strong> @apexholdings (Twitter, LinkedIn, Discord)</p>
-        </div>
-    </div>
-</div>
-
-<!-- Auth Forms -->
-<div id="authSection" style="display: none;">
-    <div id="loginForm" class="auth-container">
-        <h2>Welcome Back</h2>
-        <div id="loginAlert" class="alert"></div>
-        <div class="form-group"><input type="text" id="loginUsername" placeholder="Username"></div>
-        <div class="form-group"><input type="password" id="loginPassword" placeholder="Password"></div>
-        <button class="btn" style="width:100%" onclick="login()">Sign In</button>
-        <p style="margin-top:1rem; text-align:center;">No account? <a onclick="showAuth('register')" style="color:#00ff88; cursor:pointer;">Create one</a></p>
-    </div>
-    <div id="registerForm" class="auth-container" style="display: none;">
-        <h2>Create Account</h2>
-        <div id="registerAlert" class="alert"></div>
-        <div class="form-group"><input type="text" id="regUsername" placeholder="Username"></div>
-        <div class="form-group"><input type="email" id="regEmail" placeholder="Email"></div>
-        <div class="form-group"><input type="password" id="regPassword" placeholder="Password"></div>
-        <button class="btn" style="width:100%" onclick="register()">Get Started</button>
-        <p style="margin-top:1rem; text-align:center;">Have an account? <a onclick="showAuth('login')" style="color:#00ff88; cursor:pointer;">Sign in</a></p>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-    let currentUser = null;
-    let performanceChart = null;
-    let portfolioHistory = [100000];
-    let pendingTrade = null;
-    let currentUserTier = 1;
+let currentUser = null, pendingTrade = null, marketInterval;
+let userTier = 1, tierCapital = {1:1000, 2:5000, 3:15000};
+let portfolioHistory = [0];
 
-    function showLoading() {
-        document.getElementById('loadingOverlay').style.display = 'flex';
-    }
+function toggleMenu() { document.querySelector('.hamburger').classList.toggle('active'); document.getElementById('navLinks').classList.toggle('active'); }
+function showLoading(text='Loading...') { document.querySelector('.loading-text').innerText = text; document.getElementById('loadingOverlay').style.display = 'flex'; setTimeout(() => hideLoading(), 1500); }
+function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
 
-    function hideLoading() {
-        document.getElementById('loadingOverlay').style.display = 'none';
-    }
+function showSection(section) {
+    document.getElementById('landingSection').style.display = 'none';
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(`${section}Section`).classList.add('active');
+    if (section === 'dashboard') { loadDashboard(); startTicker(); }
+    if (section === 'trade') loadTradeStocks();
+    if (section === 'portfolio') { loadPortfolio(); loadTransactions(); }
+    if (section === 'profile') loadProfile();
+    document.querySelector('.hamburger')?.classList.remove('active');
+    document.getElementById('navLinks')?.classList.remove('active');
+}
 
-    function showModal(title, message, onConfirm) {
-        pendingTrade = onConfirm;
-        document.getElementById('modalTitle').innerText = title;
-        document.getElementById('modalMessage').innerText = message;
-        document.getElementById('modalPassword').value = '';
-        document.getElementById('confirmModal').style.display = 'flex';
-        setTimeout(() => {
-            document.getElementById('confirmModal').classList.add('show');
-        }, 10);
-    }
+function showAuth(type) {
+    document.getElementById('landingSection').style.display = 'none';
+    document.getElementById('authSection').style.display = 'block';
+    document.getElementById('loginForm').style.display = type === 'login' ? 'block' : 'none';
+    document.getElementById('registerForm').style.display = type === 'register' ? 'block' : 'none';
+}
 
-    function closeModal() {
-        document.getElementById('confirmModal').classList.remove('show');
-        setTimeout(() => {
-            document.getElementById('confirmModal').style.display = 'none';
-            pendingTrade = null;
-        }, 300);
-    }
+async function login() {
+    showLoading('Verifying credentials...');
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+    const res = await fetch('/api/login', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({username, password}) });
+    const data = await res.json();
+    hideLoading();
+    if (data.success) {
+        currentUser = data.user;
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('navLinks').style.display = 'flex';
+        document.getElementById('authLinks').style.display = 'none';
+        showSection('dashboard');
+        loadUserTier();
+    } else alert('Invalid credentials');
+}
 
-    async function confirmTrade() {
-        const password = document.getElementById('modalPassword').value;
-        if (!password) {
-            alert('Please enter your password');
-            return;
+async function register() {
+    showLoading('Creating account...');
+    const username = document.getElementById('regUsername').value;
+    const email = document.getElementById('regEmail').value;
+    const password = document.getElementById('regPassword').value;
+    const res = await fetch('/api/register', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({username, email, password}) });
+    const data = await res.json();
+    hideLoading();
+    if (data.success) { alert('Account created! Please login.'); showAuth('login'); }
+    else alert(data.error);
+}
+
+async function logout() {
+    await fetch('/api/logout', { method: 'POST' });
+    currentUser = null;
+    document.getElementById('authSection').style.display = 'block';
+    document.getElementById('navLinks').style.display = 'none';
+    document.getElementById('authLinks').style.display = 'flex';
+    document.getElementById('landingSection').style.display = 'block';
+    showAuth('login');
+    if (marketInterval) clearInterval(marketInterval);
+}
+
+async function loadUserTier() {
+    const res = await fetch('/api/user-tier');
+    const data = await res.json();
+    userTier = data.tier || 1;
+    const tiers = [1,2,3];
+    tiers.forEach(t => {
+        const badge = document.getElementById(`tier${t}Badge`);
+        if (badge) {
+            if (t === userTier) { badge.innerText = 'Current'; badge.style.background = '#8e9aaf'; }
+            else { badge.innerText = 'Upgrade'; badge.style.background = 'linear-gradient(135deg, #00ff88, #00cc66)'; }
         }
-        
-        // Verify password
-        const verifyRes = await fetch('/api/verify-password', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password })
-        });
-        const verifyData = await verifyRes.json();
-        
-        if (!verifyData.valid) {
-            alert('Incorrect password');
-            return;
-        }
-        
-        if (pendingTrade) {
-            await pendingTrade();
-        }
-        closeModal();
+    });
+    if (document.getElementById('profileTier')) {
+        const names = {1:'Bronze',2:'Silver',3:'Gold'};
+        document.getElementById('profileTier').innerText = names[userTier];
     }
+}
 
-    function showSection(section) {
-        document.getElementById('heroSection').style.display = 'none';
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.getElementById(`${section}Section`).classList.add('active');
-        if (section === 'dashboard') { loadDashboard(); startMarketTicker(); }
-        if (section === 'trade') loadTradeStocks();
-        if (section === 'portfolio') { loadPortfolio(); loadTransactions(); }
-        if (section === 'profile') loadProfilePage();
-    }
+function upgradeTier(tier) {
+    if (tier <= userTier) return;
+    const names = {2:'Silver',3:'Gold'};
+    if (confirm(`Upgrade to ${names[tier]}? Contact support for payment.`))
+        window.location.href = 'mailto:kelsey@charterflow.store?subject=Tier Upgrade Request&body=I want to upgrade to ' + names[tier] + ' tier.';
+}
 
-    function showAuth(type) {
-        document.getElementById('heroSection').style.display = 'none';
-        document.getElementById('authSection').style.display = 'block';
-        document.getElementById('loginForm').style.display = type === 'login' ? 'block' : 'none';
-        document.getElementById('registerForm').style.display = type === 'register' ? 'block' : 'none';
-    }
+function requestDeposit() { window.location.href = 'mailto:kelsey@charterflow.store?subject=Deposit Request&body=Please provide deposit instructions.'; }
+function requestWithdraw() { window.location.href = 'mailto:kelsey@charterflow.store?subject=Withdrawal Request&body=I would like to withdraw funds.'; }
 
-    async function login() {
-        showLoading();
-        const username = document.getElementById('loginUsername').value;
-        const password = document.getElementById('loginPassword').value;
-        const res = await fetch('/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        });
-        const data = await res.json();
-        hideLoading();
-        if (data.success) {
-            currentUser = data.user;
-            document.getElementById('authSection').style.display = 'none';
-            document.getElementById('navLinks').style.display = 'flex';
-            document.getElementById('authLinks').style.display = 'none';
-            showSection('dashboard');
-            initPortfolioHistory();
-            loadUserTier();
-        } else {
-            alert('Invalid credentials');
-        }
-    }
+function startTicker() { if (marketInterval) clearInterval(marketInterval); marketInterval = setInterval(() => { if (document.getElementById('dashboardSection').classList.contains('active')) updateRandomChanges(); }, 4000); }
+function updateRandomChanges() { document.querySelectorAll('.change-cell').forEach(cell => { let change = (Math.random() * 10 - 5).toFixed(2); cell.innerText = `${change>=0?'+':''}${change}%`; cell.className = change>=0 ? 'price-up change-cell' : 'price-down change-cell'; }); }
 
-    async function register() {
-        showLoading();
-        const username = document.getElementById('regUsername').value;
-        const email = document.getElementById('regEmail').value;
-        const password = document.getElementById('regPassword').value;
-        const res = await fetch('/api/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, email, password })
-        });
-        const data = await res.json();
-        hideLoading();
-        if (data.success) {
-            alert('Registration successful! Please login.');
-            showAuth('login');
-        } else {
-            alert(data.error);
-        }
-    }
+async function loadDashboard() {
+    const res = await fetch('/api/user');
+    const user = await res.json();
+    document.getElementById('cashBalance').innerText = `$${user.cash.toLocaleString()}`;
+    document.getElementById('portfolioValue').innerText = `$${user.portfolioValue.toLocaleString()}`;
+    document.getElementById('totalValue').innerText = `$${user.totalValue.toLocaleString()}`;
+    document.getElementById('availableCash').innerText = `$${user.cash.toLocaleString()}`;
+    portfolioHistory.push(user.totalValue);
+    if (portfolioHistory.length > 20) portfolioHistory.shift();
+    let change = user.totalValue - (portfolioHistory[portfolioHistory.length-2] || user.totalValue);
+    document.getElementById('dailyChange').innerHTML = `${change>=0?'+':''}$${Math.abs(change).toLocaleString()}`;
+    const stocks = await (await fetch('/api/stocks')).json();
+    document.getElementById('marketData').innerHTML = `<table class="stock-table"><thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>Change</th></tr></thead><tbody>${stocks.map(s => `<tr><td><strong>${s.symbol}</strong></td><td>${s.name}</td><td>$${s.price.toFixed(2)}</td><td class="change-cell price-up">+${(Math.random()*5).toFixed(2)}%</td></tr>`).join('')}</tbody></table>`;
+}
 
-    async function logout() {
-        await fetch('/api/logout', { method: 'POST' });
-        currentUser = null;
-        document.getElementById('authSection').style.display = 'block';
-        document.getElementById('navLinks').style.display = 'none';
-        document.getElementById('authLinks').style.display = 'flex';
-        document.getElementById('heroSection').style.display = 'block';
-        showAuth('login');
-        stopMarketTicker();
-    }
+async function loadTradeStocks() {
+    const stocks = await (await fetch('/api/stocks')).json();
+    document.getElementById('tradeStocks').innerHTML = `<table class="stock-table"><thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>Qty</th><th>Action</th></tr></thead><tbody>${stocks.map(s => `<tr><td><strong>${s.symbol}</strong></td><td>${s.name}</td><td>$${s.price.toFixed(2)}</td><td><input type="number" id="shares_${s.symbol}" class="trade-input" placeholder="Shares"></td><td><button class="btn-outline" style="margin-right:5px; padding:4px 12px;" onclick="prepareBuy('${s.symbol}')">Buy</button><button class="btn-danger" style="padding:4px 12px;" onclick="prepareSell('${s.symbol}')">Sell</button></td></tr>`).join('')}</tbody></table>`;
+}
 
-    async function loadUserTier() {
-        const res = await fetch('/api/user-tier');
-        const data = await res.json();
-        currentUserTier = data.tier || 1;
-        updateTierUI();
-    }
+let pendingSymbol, pendingShares, isBuy;
+function prepareBuy(s) { let shares = parseInt(document.getElementById(`shares_${s}`).value); if(!shares) return alert('Enter shares'); pendingSymbol=s; pendingShares=shares; isBuy=true; document.getElementById('modalTitle').innerText='Confirm Buy'; document.getElementById('modalMessage').innerText=`Buy ${shares} shares of ${s}?`; document.getElementById('confirmModal').style.display='flex'; }
+function prepareSell(s) { let shares = parseInt(document.getElementById(`shares_${s}`).value); if(!shares) return alert('Enter shares'); pendingSymbol=s; pendingShares=shares; isBuy=false; document.getElementById('modalTitle').innerText='Confirm Sell'; document.getElementById('modalMessage').innerText=`Sell ${shares} shares of ${s}?`; document.getElementById('confirmModal').style.display='flex'; }
+function closeModal() { document.getElementById('confirmModal').style.display='none'; pendingTrade=null; }
+async function confirmTrade() {
+    let pwd = document.getElementById('modalPassword').value;
+    if(!pwd) return alert('Enter password');
+    let verify = await fetch('/api/verify-password', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});
+    let v = await verify.json();
+    if(!v.valid) return alert('Wrong password');
+    let endpoint = isBuy ? '/api/buy' : '/api/sell';
+    let res = await fetch(endpoint, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({symbol:pendingSymbol, shares:pendingShares})});
+    let data = await res.json();
+    if(data.success) { alert(data.message); loadDashboard(); loadPortfolio(); loadTransactions(); }
+    else alert('Error: '+data.error);
+    closeModal();
+}
 
-    function updateTierUI() {
-        const tiers = [1, 2, 3];
-        tiers.forEach(t => {
-            const badge = document.getElementById(`tier${t}Badge`);
-            if (badge) {
-                if (t === currentUserTier) {
-                    badge.innerText = 'Current Tier';
-                    badge.style.background = '#8e9aaf';
-                    badge.style.cursor = 'default';
-                } else {
-                    badge.innerText = 'Upgrade';
-                    badge.style.background = 'linear-gradient(135deg, #00ff88, #00cc66)';
-                    badge.style.cursor = 'pointer';
-                }
-            }
-        });
-        if (document.getElementById('profileTier')) {
-            const tierNames = {1: 'Bronze', 2: 'Silver', 3: 'Gold'};
-            document.getElementById('profileTier').innerText = tierNames[currentUserTier];
-        }
-    }
+async function loadPortfolio() {
+    let portfolio = await (await fetch('/api/portfolio')).json();
+    if(!portfolio.length) { document.getElementById('portfolioList').innerHTML='<p>No holdings</p>'; return; }
+    document.getElementById('portfolioList').innerHTML = `<table class="stock-table"><thead><tr><th>Symbol</th><th>Shares</th><th>Avg</th><th>Current</th><th>Value</th><th>P&L</th></tr></thead><tbody>${portfolio.map(p => `<tr><td><strong>${p.symbol}</strong></td><td>${p.shares}</td><td>$${p.avg_price?.toFixed(2)}</td><td>$${p.currentPrice.toFixed(2)}</td><td>$${p.totalValue.toFixed(2)}</td><td class="${p.gainLoss>=0?'price-up':'price-down'}">${p.gainLoss>=0?'+':''}$${p.gainLoss?.toFixed(2)}</td></tr>`).join('')}</tbody></table>`;
+}
 
-    function upgradeTier(tier) {
-        if (tier <= currentUserTier) return;
-        const tierNames = {2: 'Silver', 3: 'Gold'};
-        if (confirm(`Upgrade to ${tierNames[tier]} tier? You'll be contacted for payment details.`)) {
-            window.location.href = 'mailto:kelsey@charterflow.store?subject=Tier Upgrade Request&body=I would like to upgrade to the ' + tierNames[tier] + ' tier.';
-        }
-    }
+async function loadTransactions() {
+    let t = await (await fetch('/api/transactions')).json();
+    if(!t.length) { document.getElementById('transactionsList').innerHTML='<p>No transactions</p>'; return; }
+    document.getElementById('transactionsList').innerHTML = `<table class="stock-table"><thead><tr><th>Date</th><th>Symbol</th><th>Type</th><th>Shares</th><th>Price</th><th>Total</th></tr></thead><tbody>${t.slice(0,10).map(tx => `<tr><td>${new Date(tx.date).toLocaleDateString()}</td><td><strong>${tx.symbol}</strong></td><td style="color:${tx.type==='BUY'?'#00ff88':'#ff3b30'}">${tx.type}</td><td>${tx.shares}</td><td>$${tx.price.toFixed(2)}</td><td>$${tx.total.toFixed(2)}</td></tr>`).join('')}</tbody></table>`;
+}
 
-    let marketInterval;
-    function startMarketTicker() {
-        if (marketInterval) clearInterval(marketInterval);
-        marketInterval = setInterval(() => {
-            if (document.getElementById('dashboardSection').classList.contains('active')) {
-                updateRandomChanges();
-            }
-        }, 3000);
-    }
+async function loadProfile() {
+    let u = await (await fetch('/api/user')).json();
+    let i = (u.username||'U').substring(0,2).toUpperCase();
+    document.getElementById('userAvatar').innerText = i;
+    document.getElementById('profileDisplayName').innerText = u.username;
+    document.getElementById('profileEmailDisplay').innerText = u.email;
+    document.getElementById('profileUsername').value = u.username;
+    document.getElementById('profileEmail').value = u.email;
+    let t = await (await fetch('/api/transactions')).json();
+    let p = await (await fetch('/api/portfolio')).json();
+    document.getElementById('statTrades').innerText = t.length;
+    document.getElementById('statHoldings').innerText = p.length;
+    document.getElementById('profileCash').innerText = `$${u.cash.toLocaleString()}`;
+    document.getElementById('profileNetWorth').innerText = `$${u.totalValue.toLocaleString()}`;
+}
 
-    function stopMarketTicker() {
-        if (marketInterval) clearInterval(marketInterval);
-    }
+async function updateProfile() {
+    let username = document.getElementById('profileUsername').value;
+    let email = document.getElementById('profileEmail').value;
+    let res = await fetch('/api/user/profile', {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,email})});
+    let data = await res.json();
+    alert(data.success ? 'Profile updated' : 'Update failed');
+    if(data.success) loadProfile();
+}
 
-    function updateRandomChanges() {
-        const rows = document.querySelectorAll('#marketData .change-cell');
-        rows.forEach(row => {
-            const randomChange = (Math.random() * 8 - 4).toFixed(2);
-            const isPositive = randomChange >= 0;
-            row.innerText = `${isPositive ? '+' : ''}${randomChange}%`;
-            row.className = isPositive ? 'price-up change-cell' : 'price-down change-cell';
-        });
-    }
-
-    async function addMoney() {
-        const amount = parseFloat(document.getElementById('cashAmount').value);
-        if (!amount || amount <= 0) return alert('Enter valid amount');
-        const res = await fetch('/api/user/add-money', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount })
-        });
-        const data = await res.json();
-        if (data.success) {
-            alert(`$${amount} added!`);
-            document.getElementById('cashAmount').value = '';
-            loadDashboard();
-        }
-    }
-
-    async function withdrawMoney() {
-        const amount = parseFloat(document.getElementById('cashAmount').value);
-        if (!amount || amount <= 0) return alert('Enter valid amount');
-        const res = await fetch('/api/user/withdraw-money', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount })
-        });
-        const data = await res.json();
-        if (data.success) {
-            alert(`$${amount} withdrawn!`);
-            document.getElementById('cashAmount').value = '';
-            loadDashboard();
-        } else {
-            alert(data.error || 'Insufficient funds');
-        }
-    }
-
-    async function loadDashboard() {
-        const res = await fetch('/api/user');
-        const user = await res.json();
-        document.getElementById('cashBalance').innerText = `$${user.cash.toLocaleString()}`;
-        document.getElementById('portfolioValue').innerText = `$${user.portfolioValue.toLocaleString()}`;
-        document.getElementById('totalValue').innerText = `$${user.totalValue.toLocaleString()}`;
-        document.getElementById('availableCash').innerText = `$${user.cash.toLocaleString()}`;
-        
-        portfolioHistory.push(user.totalValue);
-        if (portfolioHistory.length > 30) portfolioHistory.shift();
-        
-        const dailyChange = user.totalValue - (portfolioHistory[portfolioHistory.length - 2] || user.totalValue);
-        document.getElementById('dailyChange').innerText = `${dailyChange >= 0 ? '+' : ''}$${Math.abs(dailyChange).toLocaleString()}`;
-        
-        const stocksRes = await fetch('/api/stocks');
-        const stocks = await stocksRes.json();
-        let html = '<table class="stock-table"><thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>Change</th></tr></thead><tbody>';
-        stocks.forEach(s => {
-            const change = (Math.random() * 8 - 4).toFixed(2);
-            html += `<tr><td><strong>${s.symbol}</strong></td><td>${s.name || s.symbol}</td><td>$${s.price.toFixed(2)}</td><td class="change-cell ${change >= 0 ? 'price-up' : 'price-down'}">${change >= 0 ? '+' : ''}${change}%</td></tr>`;
-        });
-        html += '</tbody></table>';
-        document.getElementById('marketData').innerHTML = html;
-    }
-
-    async function loadTradeStocks() {
-        const res = await fetch('/api/stocks');
-        const stocks = await res.json();
-        let html = '<table class="stock-table"><thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>Quantity</th><th>Action</th></tr></thead><tbody>';
-        stocks.forEach(s => {
-            html += `<tr>
-                <td><strong>${s.symbol}</strong></td>
-                <td>${s.name || s.symbol}</td>
-                <td>$${s.price.toFixed(2)}</td>
-                <td><input type="number" id="shares_${s.symbol}" class="trade-input" placeholder="Shares"></td>
-                <td>
-                    <button class="btn-outline" style="margin-right:8px; padding:6px 16px;" onclick="prepareBuy('${s.symbol}')">Buy</button>
-                    <button class="btn-danger" style="padding:6px 16px;" onclick="prepareSell('${s.symbol}')">Sell</button>
-                </td>
-            </tr>`;
-        });
-        html += '</tbody></table>';
-        document.getElementById('tradeStocks').innerHTML = html;
-    }
-
-    let pendingSymbol = null;
-    let pendingShares = null;
-    let isBuy = null;
-
-    function prepareBuy(symbol) {
-        const shares = parseInt(document.getElementById(`shares_${symbol}`).value);
-        if (!shares || shares <= 0) {
-            alert('Enter valid number of shares');
-            return;
-        }
-        pendingSymbol = symbol;
-        pendingShares = shares;
-        isBuy = true;
-        showModal('Confirm Buy', `Buy ${shares} shares of ${symbol}?`, executeTrade);
-    }
-
-    function prepareSell(symbol) {
-        const shares = parseInt(document.getElementById(`shares_${symbol}`).value);
-        if (!shares || shares <= 0) {
-            alert('Enter valid number of shares');
-            return;
-        }
-        pendingSymbol = symbol;
-        pendingShares = shares;
-        isBuy = false;
-        showModal('Confirm Sell', `Sell ${shares} shares of ${symbol}?`, executeTrade);
-    }
-
-    async function executeTrade() {
-        const endpoint = isBuy ? '/api/buy' : '/api/sell';
-        const res = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ symbol: pendingSymbol, shares: pendingShares })
-        });
-        const data = await res.json();
-        if (data.success) {
-            alert(data.message);
-            loadDashboard();
-            loadPortfolio();
-            loadTransactions();
-        } else {
-            alert('Error: ' + data.error);
-        }
-        pendingSymbol = null;
-        pendingShares = null;
-    }
-
-    async function loadPortfolio() {
-        const res = await fetch('/api/portfolio');
-        const portfolio = await res.json();
-        if (portfolio.length === 0) {
-            document.getElementById('portfolioList').innerHTML = '<p style="text-align:center; padding:2rem;">No holdings yet. Start trading!</p>';
-            return;
-        }
-        let html = '<table class="stock-table"><thead><tr><th>Symbol</th><th>Shares</th><th>Avg Price</th><th>Current</th><th>Total Value</th><th>P&L</th></tr></thead><tbody>';
-        portfolio.forEach(p => {
-            html += `<tr>
-                <td><strong>${p.symbol}</strong></td>
-                <td>${p.shares}</td>
-                <td>$${p.avg_price?.toFixed(2) || '0'}</td>
-                <td>$${p.currentPrice.toFixed(2)}</td>
-                <td>$${p.totalValue.toFixed(2)}</td>
-                <td class="${p.gainLoss >= 0 ? 'price-up' : 'price-down'}">${p.gainLoss >= 0 ? '+' : ''}$${p.gainLoss?.toFixed(2) || '0'}</td>
-            </tr>`;
-        });
-        html += '</tbody></table>';
-        document.getElementById('portfolioList').innerHTML = html;
-    }
-
-    async function loadTransactions() {
-        const res = await fetch('/api/transactions');
-        const transactions = await res.json();
-        if (transactions.length === 0) {
-            document.getElementById('transactionsList').innerHTML = '<p style="text-align:center; padding:1rem;">No transactions yet</p>';
-            return;
-        }
-        let html = '<table class="stock-table"><thead><tr><th>Date</th><th>Symbol</th><th>Type</th><th>Shares</th><th>Price</th><th>Total</th></tr></thead><tbody>';
-        transactions.slice(0, 10).forEach(t => {
-            html += `<tr>
-                <td>${new Date(t.date).toLocaleDateString()}</td>
-                <td><strong>${t.symbol}</strong></td>
-                <td style="color:${t.type === 'BUY' ? '#00ff88' : '#ff3b30'}">${t.type}</td>
-                <td>${t.shares}</td>
-                <td>$${t.price.toFixed(2)}</td>
-                <td>$${t.total.toFixed(2)}</td>
-            </tr>`;
-        });
-        html += '</tbody></table>';
-        document.getElementById('transactionsList').innerHTML = html;
-    }
-
-    async function loadProfilePage() {
-        const res = await fetch('/api/user');
-        const user = await res.json();
-        const initials = (user.username || 'U').substring(0, 2).toUpperCase();
-        document.getElementById('userAvatar').innerText = initials;
-        document.getElementById('profileDisplayName').innerText = user.username;
-        document.getElementById('profileEmailDisplay').innerText = user.email;
-        document.getElementById('profileUsername').value = user.username;
-        document.getElementById('profileEmail').value = user.email;
-        
-        const tradesRes = await fetch('/api/transactions');
-        const trades = await tradesRes.json();
-        document.getElementById('statTrades').innerText = trades.length;
-        
-        const portfolioRes = await fetch('/api/portfolio');
-        const portfolio = await portfolioRes.json();
-        document.getElementById('statHoldings').innerText = portfolio.length;
-        document.getElementById('statAccountAge').innerText = Math.floor(Math.random() * 30) + 1;
-        
-        document.getElementById('profileCash').innerText = `$${user.cash.toLocaleString()}`;
-        document.getElementById('profilePortfolio').innerText = `$${user.portfolioValue.toLocaleString()}`;
-        document.getElementById('profileNetWorth').innerText = `$${user.totalValue.toLocaleString()}`;
-        document.getElementById('memberSince').innerText = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-    }
-
-    async function updateProfile() {
-        const username = document.getElementById('profileUsername').value;
-        const email = document.getElementById('profileEmail').value;
-        const res = await fetch('/api/user/profile', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, email })
-        });
-        const data = await res.json();
-        alert(data.success ? 'Profile updated!' : 'Update failed');
-        if (data.success) loadProfilePage();
-    }
-
-    async function changePassword() {
-        const current = document.getElementById('currentPassword').value;
-        const newPass = document.getElementById('newPassword').value;
-        const confirm = document.getElementById('confirmPassword').value;
-        if (!current || !newPass) return alert('Fill all fields');
-        if (newPass !== confirm) return alert('Passwords do not match');
-        const res = await fetch('/api/user/password', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ currentPassword: current, newPassword: newPass })
-        });
-        const data = await res.json();
-        alert(data.success ? 'Password updated!' : 'Current password incorrect');
-        if (data.success) {
-            document.getElementById('currentPassword').value = '';
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmPassword').value = '';
-        }
-    }
-
-    function initPortfolioHistory() {
-        portfolioHistory = [100000];
-        for (let i = 1; i < 20; i++) {
-            portfolioHistory.push(portfolioHistory[i-1] + (Math.random() - 0.5) * 2000);
-        }
-    }
+async function changePassword() {
+    let cur = document.getElementById('currentPassword').value;
+    let n = document.getElementById('newPassword').value;
+    let c = document.getElementById('confirmPassword').value;
+    if(!cur||!n) return alert('Fill fields');
+    if(n!==c) return alert('Passwords dont match');
+    let res = await fetch('/api/user/password', {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({currentPassword:cur, newPassword:n})});
+    let data = await res.json();
+    alert(data.success ? 'Password updated' : 'Current password wrong');
+    if(data.success) { document.getElementById('currentPassword').value=''; document.getElementById('newPassword').value=''; document.getElementById('confirmPassword').value=''; }
+}
 </script>
 </body>
 </html>
