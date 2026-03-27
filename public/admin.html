@@ -50,7 +50,6 @@
             margin-right: 0.5rem;
         }
         .btn-danger { background: linear-gradient(135deg, #ff3b30, #cc2f24); color: white; }
-        .btn-warning { background: linear-gradient(135deg, #ff9500, #cc7700); color: white; }
         table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
         th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
         th { color: #00ff88; }
@@ -75,7 +74,6 @@
             text-align: center;
         }
         .stat-number { font-size: 1.8rem; font-weight: bold; color: #00ff88; }
-        .stat-label { font-size: 0.8rem; color: #8e9aaf; }
         .tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .tab { padding: 0.75rem 1.5rem; cursor: pointer; background: none; border: none; color: #8e9aaf; }
         .tab.active { color: #00ff88; border-bottom: 2px solid #00ff88; }
@@ -101,7 +99,6 @@
             <button class="tab active" onclick="showTab('users')">👥 Users</button>
             <button class="tab" onclick="showTab('stocks')">📈 Stocks</button>
             <button class="tab" onclick="showTab('transactions')">📋 Transactions</button>
-            <button class="tab" onclick="showTab('system')">⚙️ System</button>
         </div>
 
         <!-- Users Tab -->
@@ -115,12 +112,11 @@
                         <div class="form-group"><label>Select User</label><select id="cashUserId"></select></div>
                         <div class="form-group"><label>Amount ($)</label><input type="number" id="cashAmount" placeholder="Amount"></div>
                         <button onclick="addCash()">Add Cash</button>
-                        <button onclick="setExactCash()" class="btn-warning">Set Exact Cash</button>
                     </div>
                     <div>
                         <h3>Reset / Delete User</h3>
                         <div class="form-group"><label>Select User</label><select id="resetUserId"></select></div>
-                        <button onclick="resetUser()" class="btn-warning">🔄 Reset Account ($100k)</button>
+                        <button onclick="resetUser()" class="btn-danger">🔄 Reset Account ($100k)</button>
                         <button onclick="deleteUser()" class="btn-danger">🗑️ DELETE USER</button>
                     </div>
                 </div>
@@ -128,36 +124,31 @@
             </div>
         </div>
 
-        <!-- Stocks Tab -->
+        <!-- Stocks Tab - Full Edit Capabilities -->
         <div id="stocksTab" class="tab-content">
             <div class="card">
-                <h2>📈 Stock Management</h2>
+                <h2>📈 Stock Management - Edit, Add, Delete</h2>
                 <div id="stockAlert" class="alert"></div>
+                
+                <h3>✏️ Edit Existing Stock</h3>
                 <div class="grid" style="grid-template-columns: 1fr 1fr;">
                     <div>
-                        <h3>Update Stock Price</h3>
-                        <div class="form-group"><label>Select Stock</label><select id="stockSymbol"></select></div>
-                        <div class="form-group"><label>New Price ($)</label><input type="number" id="stockPrice" step="0.01"></div>
-                        <button onclick="updatePrice()">Update Price</button>
+                        <div class="form-group"><label>Select Stock</label><select id="editStockSymbol" onchange="loadStockForEdit()"></select></div>
+                        <div class="form-group"><label>Symbol</label><input type="text" id="editSymbol" placeholder="Symbol"></div>
+                        <div class="form-group"><label>Company Name</label><input type="text" id="editName" placeholder="Company Name"></div>
+                        <div class="form-group"><label>Price ($)</label><input type="number" id="editPrice" step="0.01" placeholder="Price"></div>
+                        <button onclick="updateStock()">Update Stock</button>
+                        <button onclick="deleteStock()" class="btn-danger">Delete Stock</button>
                     </div>
                     <div>
-                        <h3>Edit Stock Details</h3>
-                        <div class="form-group"><label>Select Stock</label><select id="editStockSymbol" onchange="loadStockDetails()"></select></div>
-                        <div class="form-group"><label>Name</label><input type="text" id="stockName"></div>
-                        <div class="form-group"><label>Volume</label><input type="text" id="stockVolume"></div>
-                        <div class="form-group"><label>Market Cap</label><input type="text" id="stockMarketCap"></div>
-                        <button onclick="updateStockDetails()">Update Details</button>
+                        <h3 style="margin-bottom: 1rem;">➕ Add New Stock</h3>
+                        <div class="form-group"><label>Symbol</label><input type="text" id="newSymbol" placeholder="e.g., NFLX"></div>
+                        <div class="form-group"><label>Company Name</label><input type="text" id="newName" placeholder="Company Name"></div>
+                        <div class="form-group"><label>Initial Price ($)</label><input type="number" id="newPrice" step="0.01" placeholder="Price"></div>
+                        <button onclick="addStock()">Add New Stock</button>
                     </div>
                 </div>
                 <div id="stocksList"></div>
-                <hr style="margin: 1rem 0; border-color: rgba(255,255,255,0.1);">
-                <h3>➕ Add New Stock</h3>
-                <div class="grid" style="grid-template-columns: repeat(4, 1fr);">
-                    <input type="text" id="newSymbol" placeholder="Symbol (e.g., NFLX)">
-                    <input type="text" id="newName" placeholder="Company Name">
-                    <input type="number" id="newPrice" placeholder="Price">
-                    <button onclick="addStock()">Add Stock</button>
-                </div>
             </div>
         </div>
 
@@ -166,18 +157,6 @@
             <div class="card">
                 <h2>📋 All Transactions</h2>
                 <div id="transactionsList"></div>
-            </div>
-        </div>
-
-        <!-- System Tab -->
-        <div id="systemTab" class="tab-content">
-            <div class="card">
-                <h2>⚙️ System Control</h2>
-                <div id="systemAlert" class="alert"></div>
-                <p><strong>Admin Secret:</strong> ApexMaster2024</p>
-                <p><strong>Admin Panel URL:</strong> /admin.html (hidden from users)</p>
-                <button onclick="refreshData()">🔄 Refresh All Data</button>
-                <button onclick="exportData()" class="btn-warning">📥 Export Data</button>
             </div>
         </div>
     </div>
@@ -209,18 +188,8 @@
             });
             
             document.getElementById('usersList').innerHTML = `
-                <table>
-                    <thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Cash</th><th>Portfolio</th><th>Joined</th></tr></thead>
-                    <tbody>${users.map(u => `
-                        <tr>
-                            <td>${u.id}</td>
-                            <td><strong>${u.username}</strong></td>
-                            <td>${u.email}</td>
-                            <td style="color:#00ff88">$${(u.cash || 0).toLocaleString()}</td>
-                            <td>$${(u.portfolio_value || 0).toLocaleString()}</td>
-                            <td>${new Date(u.created_at).toLocaleDateString()}</td>
-                        </tr>
-                    `).join('')}</tbody>
+                <table><thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Cash</th><th>Joined</th></tr></thead>
+                <tbody>${users.map(u => `<tr><td>${u.id}</td><td><strong>${u.username}</strong></td><td>${u.email}</td><td style="color:#00ff88">$${(u.cash || 0).toLocaleString()}</td><td>${new Date(u.created_at).toLocaleDateString()}</td></tr>`).join('')}</tbody>
                 </table>
             `;
         }
@@ -229,93 +198,61 @@
             const res = await fetch(`/api/admin/${ADMIN_SECRET}/stocks`);
             const stocks = await res.json();
             
-            const stockSelect = document.getElementById('stockSymbol');
             const editSelect = document.getElementById('editStockSymbol');
-            stockSelect.innerHTML = '';
-            editSelect.innerHTML = '';
-            
+            editSelect.innerHTML = '<option value="">Select stock...</option>';
             stocks.forEach(s => {
-                stockSelect.innerHTML += `<option value="${s.symbol}">${s.symbol} - $${s.price}</option>`;
                 editSelect.innerHTML += `<option value="${s.symbol}">${s.symbol} - ${s.name}</option>`;
             });
             
             document.getElementById('stocksList').innerHTML = `
-                <table>
-                    <thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>Change</th><th>Volume</th><th>Mkt Cap</th><th>Day Range</th></tr></thead>
-                    <tbody>${stocks.map(s => `
-                        <tr>
-                            <td><strong>${s.symbol}</strong></td>
-                            <td>${s.name || s.symbol}</td>
-                            <td style="color:#00ff88">$${s.price.toFixed(2)}</td>
-                            <td class="${s.change >= 0 ? 'price-up' : 'price-down'}">${s.change >= 0 ? '+' : ''}${s.change || 0}%</td>
-                            <td>${(s.volume / 1000000).toFixed(1)}M</td>
-                            <td>${s.market_cap || 'N/A'}</td>
-                            <td>$${s.day_low || s.price-5} - $${s.day_high || s.price+5}</td>
-                        </tr>
-                    `).join('')}</tbody>
+                <table><thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>Change</th></tr></thead>
+                <tbody>${stocks.map(s => `<tr><td><strong>${s.symbol}</strong></td><td>${s.name || s.symbol}</td><td style="color:#00ff88">$${s.price.toFixed(2)}</td><td class="${s.change >= 0 ? 'price-up' : 'price-down'}">${s.change >= 0 ? '+' : ''}${s.change || 0}%</td></tr>`).join('')}</tbody>
                 </table>
             `;
         }
 
-        async function loadStockDetails() {
+        async function loadStockForEdit() {
             const symbol = document.getElementById('editStockSymbol').value;
             if (!symbol) return;
             const res = await fetch(`/api/admin/${ADMIN_SECRET}/stocks`);
             const stocks = await res.json();
             const stock = stocks.find(s => s.symbol === symbol);
             if (stock) {
-                document.getElementById('stockName').value = stock.name || '';
-                document.getElementById('stockVolume').value = stock.volume || '';
-                document.getElementById('stockMarketCap').value = stock.market_cap || '';
+                document.getElementById('editSymbol').value = stock.symbol;
+                document.getElementById('editName').value = stock.name || '';
+                document.getElementById('editPrice').value = stock.price;
             }
         }
 
-        async function loadTransactions() {
-            const res = await fetch(`/api/admin/${ADMIN_SECRET}/transactions`);
-            const transactions = await res.json();
-            document.getElementById('transactionsList').innerHTML = `
-                <table>
-                    <thead><tr><th>Date</th><th>User</th><th>Symbol</th><th>Type</th><th>Shares</th><th>Price</th><th>Total</th></tr></thead>
-                    <tbody>${transactions.map(t => `
-                        <tr>
-                            <td>${new Date(t.date).toLocaleString()}</td>
-                            <td><strong>${t.username}</strong></td>
-                            <td>${t.symbol}</td>
-                            <td style="color:${t.type === 'BUY' ? '#00ff88' : '#ff3b30'}">${t.type}</td>
-                            <td>${t.shares}</td>
-                            <td>$${t.price.toFixed(2)}</td>
-                            <td>$${t.total.toFixed(2)}</td>
-                        </tr>
-                    `).join('')}</tbody>
-                </table>
-            `;
-        }
-
-        async function updatePrice() {
-            const symbol = document.getElementById('stockSymbol').value;
-            const price = parseFloat(document.getElementById('stockPrice').value);
-            if (!price) return;
-            const res = await fetch(`/api/admin/${ADMIN_SECRET}/stock/${symbol}/price`, {
+        async function updateStock() {
+            const oldSymbol = document.getElementById('editStockSymbol').value;
+            const newSymbol = document.getElementById('editSymbol').value;
+            const name = document.getElementById('editName').value;
+            const price = parseFloat(document.getElementById('editPrice').value);
+            
+            if (!oldSymbol || !price) return alert('Select stock and enter price');
+            
+            const res = await fetch(`/api/admin/${ADMIN_SECRET}/stock/update`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ price })
+                body: JSON.stringify({ oldSymbol, newSymbol, name, price })
             });
             const data = await res.json();
-            showAlert('stockAlert', `Price updated: $${data.oldPrice} → $${data.newPrice} (${data.change}%)`, 'success');
+            showAlert('stockAlert', data.message || 'Stock updated!', 'success');
             loadStocks();
         }
 
-        async function updateStockDetails() {
+        async function deleteStock() {
             const symbol = document.getElementById('editStockSymbol').value;
-            const name = document.getElementById('stockName').value;
-            const volume = parseInt(document.getElementById('stockVolume').value);
-            const market_cap = document.getElementById('stockMarketCap').value;
-            const res = await fetch(`/api/admin/${ADMIN_SECRET}/stock/${symbol}`, {
-                method: 'PUT',
+            if (!symbol) return;
+            if (!confirm(`Delete ${symbol}? This cannot be undone.`)) return;
+            const res = await fetch(`/api/admin/${ADMIN_SECRET}/stock/delete`, {
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, volume, market_cap })
+                body: JSON.stringify({ symbol })
             });
-            showAlert('stockAlert', 'Stock details updated', 'success');
+            const data = await res.json();
+            showAlert('stockAlert', data.message || 'Stock deleted!', 'success');
             loadStocks();
         }
 
@@ -323,13 +260,29 @@
             const symbol = document.getElementById('newSymbol').value.toUpperCase();
             const name = document.getElementById('newName').value;
             const price = parseFloat(document.getElementById('newPrice').value);
-            const res = await fetch(`/api/admin/${ADMIN_SECRET}/stock`, {
+            if (!symbol || !name || !price) return alert('Fill all fields');
+            
+            const res = await fetch(`/api/admin/${ADMIN_SECRET}/stock/add`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ symbol, name, price, volume: 1000000, market_cap: 'N/A' })
+                body: JSON.stringify({ symbol, name, price })
             });
-            showAlert('stockAlert', `Stock ${symbol} added!`, 'success');
+            const data = await res.json();
+            showAlert('stockAlert', data.message || 'Stock added!', 'success');
+            document.getElementById('newSymbol').value = '';
+            document.getElementById('newName').value = '';
+            document.getElementById('newPrice').value = '';
             loadStocks();
+        }
+
+        async function loadTransactions() {
+            const res = await fetch(`/api/admin/${ADMIN_SECRET}/transactions`);
+            const transactions = await res.json();
+            document.getElementById('transactionsList').innerHTML = `
+                <table><thead><tr><th>Date</th><th>User</th><th>Symbol</th><th>Type</th><th>Shares</th><th>Price</th><th>Total</th></tr></thead>
+                <tbody>${transactions.map(t => `<tr><td>${new Date(t.date).toLocaleString()}</td><td><strong>${t.username}</strong></td><td>${t.symbol}</td><td style="color:${t.type === 'BUY' ? '#00ff88' : '#ff3b30'}">${t.type}</td><td>${t.shares}</td><td>$${t.price.toFixed(2)}</td><td>$${t.total.toFixed(2)}</td></tr>`).join('')}</tbody>
+                </table>
+            `;
         }
 
         async function addCash() {
@@ -346,38 +299,19 @@
             loadStats();
         }
 
-        async function setExactCash() {
-            const userId = document.getElementById('cashUserId').value;
-            const amount = parseFloat(document.getElementById('cashAmount').value);
-            if (!userId || !amount) return;
-            const res = await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}/setcash`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cash: amount })
-            });
-            showAlert('userAlert', `Set user cash to $${amount}`, 'success');
-            loadUsers();
-            loadStats();
-        }
-
         async function resetUser() {
             const userId = document.getElementById('resetUserId').value;
-            if (!userId || !confirm('Reset this user to $100,000? This deletes all holdings.')) return;
-            const res = await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}/reset`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            showAlert('userAlert', 'User reset to $100,000', 'success');
+            if (!userId || !confirm('Reset this user to $100,000?')) return;
+            await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}/reset`, { method: 'POST' });
+            showAlert('userAlert', 'User reset', 'success');
             loadUsers();
             loadStats();
         }
 
         async function deleteUser() {
             const userId = document.getElementById('resetUserId').value;
-            if (!userId || !confirm('PERMANENTLY DELETE this user? This cannot be undone!')) return;
-            const res = await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}`, {
-                method: 'DELETE'
-            });
+            if (!userId || !confirm('PERMANENTLY DELETE this user?')) return;
+            await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}`, { method: 'DELETE' });
             showAlert('userAlert', 'User deleted', 'success');
             loadUsers();
             loadStats();
@@ -400,19 +334,6 @@
             setTimeout(() => { alertDiv.className = 'alert'; }, 3000);
         }
 
-        function refreshData() {
-            loadStats();
-            loadUsers();
-            loadStocks();
-            loadTransactions();
-            showAlert('systemAlert', 'All data refreshed', 'success');
-        }
-
-        function exportData() {
-            alert('Export feature - would download CSV of all user data');
-        }
-
-        // Initial load
         loadStats();
         loadUsers();
         loadStocks();
