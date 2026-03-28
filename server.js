@@ -332,7 +332,22 @@ app.get('/api/admin/:secret/stats', async (req, res) => {
         totalPortfolioValue: 0
     });
 });
-
+// Force create stocks on startup
+app.get('/api/fix-stocks', async (req, res) => {
+    await pool.query("DELETE FROM stocks");
+    await pool.query(`INSERT INTO stocks (symbol, name, price) VALUES 
+        ('AAPL', 'Apple Inc.', 175.32),
+        ('GOOGL', 'Alphabet Inc.', 142.65),
+        ('MSFT', 'Microsoft Corp.', 378.45),
+        ('AMZN', 'Amazon.com Inc.', 145.78),
+        ('TSLA', 'Tesla Inc.', 245.67),
+        ('META', 'Meta Platforms', 334.56),
+        ('NVDA', 'NVIDIA Corp.', 895.23),
+        ('JPM', 'JPMorgan Chase', 185.45),
+        ('V', 'Visa Inc.', 268.34),
+        ('WMT', 'Walmart Inc.', 165.78)`);
+    res.send("Stocks added!");
+});
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
