@@ -22,10 +22,7 @@ const pool = new Pool({
     ssl: { rejectUnauthorized: false }
 });
 
-// Tier capital mapping
-const TIER_CAPITAL = { 1: 1000, 2: 5000, 3: 15000 };
-const TIER_NAMES = { 1: 'Bronze', 2: 'Silver', 3: 'Gold' };
-
+// Initialize database tables
 async function initDB() {
     await pool.query(`
         CREATE TABLE IF NOT EXISTS users (
@@ -71,20 +68,22 @@ async function initDB() {
         )
     `);
     
+    // Check if stocks exist, if not, add them
     const result = await pool.query("SELECT COUNT(*) FROM stocks");
     if (parseInt(result.rows[0].count) === 0) {
-        const stocks = [
-            ['AAPL', 'Apple Inc.', 175.32],
-            ['GOOGL', 'Alphabet Inc.', 142.65],
-            ['MSFT', 'Microsoft Corp.', 378.45],
-            ['AMZN', 'Amazon.com Inc.', 145.78],
-            ['TSLA', 'Tesla Inc.', 245.67],
-            ['META', 'Meta Platforms', 334.56],
-            ['NVDA', 'NVIDIA Corp.', 895.23]
-        ];
-        for (const s of stocks) {
-            await pool.query("INSERT INTO stocks (symbol, name, price) VALUES ($1, $2, $3)", s);
-        }
+        await pool.query(`
+            INSERT INTO stocks (symbol, name, price) VALUES 
+            ('AAPL', 'Apple Inc.', 175.32),
+            ('GOOGL', 'Alphabet Inc.', 142.65),
+            ('MSFT', 'Microsoft Corp.', 378.45),
+            ('AMZN', 'Amazon.com Inc.', 145.78),
+            ('TSLA', 'Tesla Inc.', 245.67),
+            ('META', 'Meta Platforms', 334.56),
+            ('NVDA', 'NVIDIA Corp.', 895.23),
+            ('JPM', 'JPMorgan Chase', 185.45),
+            ('V', 'Visa Inc.', 268.34),
+            ('WMT', 'Walmart Inc.', 165.78)
+        `);
     }
 }
 
@@ -95,18 +94,19 @@ async function getStocks() {
     return result.rows;
 }
 
-// Register - starts with $0
+// REGISTER
 app.post('/api/register', async (req, res) => {
     const { username, email, password } = req.body;
     const hashed = await bcrypt.hash(password, 10);
     try {
         await pool.query("INSERT INTO users (username, email, password, cash) VALUES ($1, $2, $3, 0)", [username, email, hashed]);
-        res.json({ success: true, message: "Account created! Please login." });
+        res.json({ success: true, message: "Account created!" });
     } catch (err) {
         res.status(400).json({ error: 'Username or email already exists' });
     }
 });
 
+// LOGIN
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
     const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
@@ -118,11 +118,13 @@ app.post('/api/login', async (req, res) => {
     res.json({ success: true, user });
 });
 
+// LOGOUT
 app.post('/api/logout', (req, res) => {
     req.session.destroy();
     res.json({ success: true });
 });
 
+// GET USER DATA
 app.get('/api/user', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
     const user = await pool.query("SELECT * FROM users WHERE id = $1", [req.session.userId]);
@@ -136,17 +138,23 @@ app.get('/api/user', async (req, res) => {
     res.json({ ...user.rows[0], portfolioValue, totalValue: user.rows[0].cash + portfolioValue });
 });
 
+// GET USER TIER
 app.get('/api/user-tier', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
     const result = await pool.query("SELECT tier FROM users WHERE id = $1", [req.session.userId]);
-    res.json({ tier: result.rows[0]?.tier || 1, name: TIER_NAMES[result.rows[0]?.tier || 1], capital: TIER_CAPITAL[result.rows[0]?.tier || 1] });
+    const tier = result.rows[0]?.tier || 1;
+    const tierNames = {1: 'Bronze', 2: 'Silver', 3: 'Gold'};
+    const tierCapital = {1: 1000, 2: 5000, 3: 15000};
+    res.json({ tier, name: tierNames[tier], capital: tierCapital[tier] });
 });
 
+// GET STOCKS
 app.get('/api/stocks', async (req, res) => {
     const stocks = await getStocks();
     res.json(stocks);
 });
 
+// GET PORTFOLIO
 app.get('/api/portfolio', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
     const portfolio = await pool.query("SELECT symbol, shares, avg_price FROM portfolio WHERE user_id = $1", [req.session.userId]);
@@ -154,17 +162,21 @@ app.get('/api/portfolio', async (req, res) => {
     const enriched = portfolio.rows.map(p => {
         const stock = stocks.find(s => s.symbol === p.symbol);
         const currentPrice = stock?.price || 0;
-        return { ...p, currentPrice, totalValue: currentPrice * p.shares, gainLoss: (currentPrice - p.avg_price) * p.shares };
+        const totalValue = currentPrice * p.shares;
+        const gainLoss = (currentPrice - p.avg_price) * p.shares;
+        return { ...p, currentPrice, totalValue, gainLoss };
     });
     res.json(enriched);
 });
 
+// GET TRANSACTIONS
 app.get('/api/transactions', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
     const result = await pool.query("SELECT * FROM transactions WHERE user_id = $1 ORDER BY date DESC LIMIT 50", [req.session.userId]);
     res.json(result.rows);
 });
 
+// BUY
 app.post('/api/buy', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
     const { symbol, shares } = req.body;
@@ -186,9 +198,10 @@ app.post('/api/buy', async (req, res) => {
     }
     
     await pool.query("INSERT INTO transactions (user_id, symbol, type, shares, price, total) VALUES ($1, $2, $3, $4, $5, $6)", [req.session.userId, symbol, 'BUY', shares, stock.rows[0].price, cost]);
-    res.json({ success: true, message: `Bought ${shares} shares of ${symbol}` });
+    res.json({ success: true, message: `Bought ${shares} shares of ${symbol} at $${stock.rows[0].price}` });
 });
 
+// SELL
 app.post('/api/sell', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
     const { symbol, shares } = req.body;
@@ -206,9 +219,10 @@ app.post('/api/sell', async (req, res) => {
     }
     
     await pool.query("INSERT INTO transactions (user_id, symbol, type, shares, price, total) VALUES ($1, $2, $3, $4, $5, $6)", [req.session.userId, symbol, 'SELL', shares, stock.rows[0].price, value]);
-    res.json({ success: true, message: `Sold ${shares} shares of ${symbol}` });
+    res.json({ success: true, message: `Sold ${shares} shares of ${symbol} at $${stock.rows[0].price}` });
 });
 
+// UPDATE PROFILE
 app.put('/api/user/profile', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
     const { username, email } = req.body;
@@ -217,6 +231,7 @@ app.put('/api/user/profile', async (req, res) => {
     res.json({ success: true });
 });
 
+// CHANGE PASSWORD
 app.put('/api/user/password', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
     const { currentPassword, newPassword } = req.body;
@@ -228,15 +243,17 @@ app.put('/api/user/password', async (req, res) => {
     res.json({ success: true });
 });
 
-// Deposit/Withdraw redirect to email
+// DEPOSIT REQUEST - EMAIL
 app.post('/api/user/add-money', (req, res) => {
     res.json({ redirect: true, email: 'kelsey@charterflow.store' });
 });
 
+// WITHDRAW REQUEST - EMAIL
 app.post('/api/user/withdraw-money', (req, res) => {
     res.json({ redirect: true, email: 'kelsey@charterflow.store' });
 });
 
+// VERIFY PASSWORD
 app.post('/api/verify-password', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
     const { password } = req.body;
@@ -245,7 +262,7 @@ app.post('/api/verify-password', async (req, res) => {
     res.json({ valid });
 });
 
-// Admin routes
+// ADMIN ROUTES
 const ADMIN_SECRET = 'ApexMaster2024';
 
 app.get('/api/admin/:secret/users', async (req, res) => {
@@ -264,16 +281,18 @@ app.post('/api/admin/:secret/user/:id/cash', async (req, res) => {
 app.post('/api/admin/:secret/user/:id/tier', async (req, res) => {
     if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
     const { tier } = req.body;
-    const newCash = TIER_CAPITAL[tier] || 1000;
+    const tierCapital = {1: 1000, 2: 5000, 3: 15000};
+    const newCash = tierCapital[tier] || 1000;
     await pool.query("UPDATE users SET tier = $1, cash = $2 WHERE id = $3", [tier, newCash, req.params.id]);
-    res.json({ success: true, newCash, tierName: TIER_NAMES[tier] });
+    res.json({ success: true, newCash });
 });
 
 app.post('/api/admin/:secret/user/:id/reset', async (req, res) => {
     if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
     const user = await pool.query("SELECT tier FROM users WHERE id = $1", [req.params.id]);
     const tier = user.rows[0]?.tier || 1;
-    const newCash = TIER_CAPITAL[tier];
+    const tierCapital = {1: 1000, 2: 5000, 3: 15000};
+    const newCash = tierCapital[tier];
     await pool.query("DELETE FROM portfolio WHERE user_id = $1", [req.params.id]);
     await pool.query("DELETE FROM transactions WHERE user_id = $1", [req.params.id]);
     await pool.query("UPDATE users SET cash = $1 WHERE id = $2", [newCash, req.params.id]);
@@ -328,26 +347,10 @@ app.get('/api/admin/:secret/stats', async (req, res) => {
     res.json({
         totalUsers: parseInt(userStats.rows[0].totalusers) || 0,
         totalCash: parseFloat(userStats.rows[0].totalcash) || 0,
-        totalTrades: parseInt(tradeStats.rows[0].totaltrades) || 0,
-        totalPortfolioValue: 0
+        totalTrades: parseInt(tradeStats.rows[0].totaltrades) || 0
     });
 });
-// Force create stocks on startup
-app.get('/api/fix-stocks', async (req, res) => {
-    await pool.query("DELETE FROM stocks");
-    await pool.query(`INSERT INTO stocks (symbol, name, price) VALUES 
-        ('AAPL', 'Apple Inc.', 175.32),
-        ('GOOGL', 'Alphabet Inc.', 142.65),
-        ('MSFT', 'Microsoft Corp.', 378.45),
-        ('AMZN', 'Amazon.com Inc.', 145.78),
-        ('TSLA', 'Tesla Inc.', 245.67),
-        ('META', 'Meta Platforms', 334.56),
-        ('NVDA', 'NVIDIA Corp.', 895.23),
-        ('JPM', 'JPMorgan Chase', 185.45),
-        ('V', 'Visa Inc.', 268.34),
-        ('WMT', 'Walmart Inc.', 165.78)`);
-    res.send("Stocks added!");
-});
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
