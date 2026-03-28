@@ -148,6 +148,7 @@
             font-size: 0.7rem;
             display: inline-block;
             cursor: pointer;
+            margin-top: 0.5rem;
         }
         .loading-overlay {
             position: fixed;
@@ -279,13 +280,6 @@
             font-weight: bold;
             color: #0a0c10;
         }
-        .holding-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.8rem;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
     </style>
 </head>
 <body>
@@ -311,16 +305,16 @@
 </nav>
 
 <div id="loadingOverlay" class="loading-overlay"><div class="loading-spinner"></div><div class="loading-text">Loading...</div></div>
-<div id="confirmModal" class="modal"><div class="modal-content"><h3 id="modalTitle">Confirm</h3><p id="modalMessage"></p><input type="password" id="modalPassword" placeholder="Enter password"><button class="btn" onclick="confirmTrade()">Confirm</button><button class="btn-danger" onclick="closeModal()">Cancel</button></div></div>
+<div id="confirmModal" class="modal"><div class="modal-content"><h3 id="modalTitle">Confirm</h3><p id="modalMessage"></p><input type="password" id="modalPassword" placeholder="Enter password"><div class="modal-buttons"><button class="btn" onclick="confirmTrade()">Confirm</button><button class="btn-danger" onclick="closeModal()">Cancel</button></div></div></div>
 
-<!-- Landing/About Page -->
+<!-- About Page -->
 <div id="aboutSection" class="section active">
     <div class="hero"><div><h1>Trade Like an Institution</h1><p>Professional stock simulation • Zero risk • Learn to trade</p><button class="btn" onclick="showAuth('register')">Start Trading →</button></div></div>
     <div class="container">
         <div class="features-grid">
-            <div class="feature-card"><strong>📊 Real-time Data</strong><br>Live market prices</div>
-            <div class="feature-card"><strong>💰 $0 Starting Capital</strong><br>Deposit to begin</div>
-            <div class="feature-card"><strong>🏆 Tier System</strong><br>Bronze → Silver → Gold</div>
+            <div class="feature-card"><strong>📊 Real-time Data</strong><br>Live market prices with random changes</div>
+            <div class="feature-card"><strong>💰 $0 Starting Capital</strong><br>Deposit to begin trading</div>
+            <div class="feature-card"><strong>🏆 3 Tier System</strong><br>Bronze → Silver → Gold</div>
         </div>
         <div class="card"><h2>Our Leadership</h2><div class="team-grid"><div class="team-card"><div class="team-avatar">MK</div><div class="team-name">Marcus Kelsey</div><div>CEO & Founder</div><div class="team-bio">Former Goldman Sachs VP</div></div><div class="team-card"><div class="team-avatar">SR</div><div class="team-name">Sarah Rodriguez</div><div>CTO</div><div class="team-bio">Ex-Microsoft Architect</div></div><div class="team-card"><div class="team-avatar">JC</div><div class="team-name">James Chen</div><div>Head of Education</div><div class="team-bio">CFA Instructor</div></div></div></div>
         <div class="card"><h2>Contact Support</h2><p>Email: kelsey@charterflow.store<br>24/7 Support</p></div>
@@ -337,7 +331,7 @@
             <div class="stat-card"><div class="stat-label">Today's Change</div><div class="stat-value" id="dailyChange">$0</div></div>
         </div>
         <div class="card"><h2>💰 Cash Management</h2><div style="display:flex; gap:0.5rem; flex-wrap:wrap;"><div style="flex:1"><input type="number" id="cashAmount" placeholder="Amount" style="width:100%; padding:0.6rem; background:#1a1c22; border:1px solid rgba(0,255,100,0.2); border-radius:8px; color:white;"><div style="display:flex; gap:0.5rem; margin-top:0.5rem;"><button class="btn" style="flex:1" onclick="requestDeposit()">+ Deposit</button><button class="btn-danger" style="flex:1" onclick="requestWithdraw()">- Withdraw</button></div></div><div style="flex:1; background:rgba(0,255,100,0.05); border-radius:12px; padding:0.8rem;"><div class="stat-label">AVAILABLE CASH</div><div style="font-size:1.2rem; font-weight:bold; color:#00ff88;" id="availableCash">$0</div></div></div></div>
-        <div class="card"><h2>🏆 Account Tiers</h2><div class="tier-grid" id="tierGrid"><div class="tier-card" data-tier="1"><div class="tier-name">🥉 Bronze</div><div class="tier-benefits">$1,000 capital</div><div id="tier1Badge" class="upgrade-btn">Current</div></div><div class="tier-card" data-tier="2"><div class="tier-name">🥈 Silver</div><div class="tier-benefits">$5,000 capital</div><div id="tier2Badge" class="upgrade-btn">Upgrade</div></div><div class="tier-card" data-tier="3"><div class="tier-name">🥇 Gold</div><div class="tier-benefits">$15,000 capital</div><div id="tier3Badge" class="upgrade-btn">Upgrade</div></div></div></div>
+        <div class="card"><h2>🏆 Account Tiers</h2><div class="tier-grid" id="tierGrid"><div class="tier-card" onclick="upgradeTier(1)"><div class="tier-name">🥉 Bronze</div><div class="tier-benefits">$1,000 capital</div><div id="tier1Badge" class="upgrade-btn">Current</div></div><div class="tier-card" onclick="upgradeTier(2)"><div class="tier-name">🥈 Silver</div><div class="tier-benefits">$5,000 capital</div><div id="tier2Badge" class="upgrade-btn">Upgrade</div></div><div class="tier-card" onclick="upgradeTier(3)"><div class="tier-name">🥇 Gold</div><div class="tier-benefits">$15,000 capital</div><div id="tier3Badge" class="upgrade-btn">Upgrade</div></div></div></div>
         <div class="card"><h2>📊 Market Overview</h2><div id="marketData"></div></div>
     </div>
 </div>
@@ -364,7 +358,7 @@
             <div class="avatar" id="userAvatar"></div>
             <h2 id="profileName" style="text-align:center"></h2>
             <p id="profileEmail" style="text-align:center; color:#8e9aaf"></p>
-            <p id="profileTierDisplay" style="text-align:center; margin-top:0.5rem">Tier: <strong id="profileTier">Bronze</strong></p>
+            <p style="text-align:center; margin-top:0.5rem">Tier: <strong id="profileTier">Bronze</strong></p>
             <div class="stats-grid" style="margin-top:1rem">
                 <div class="stat-card"><div class="stat-label">Trades</div><div class="stat-value" id="statTrades">0</div></div>
                 <div class="stat-card"><div class="stat-label">Holdings</div><div class="stat-value" id="statHoldings">0</div></div>
@@ -399,7 +393,6 @@ function hideLoading() { document.getElementById('loadingOverlay').style.display
 function showSection(section) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.getElementById(`${section}Section`).classList.add('active');
-    document.getElementById('aboutSection').style.display = section === 'about' ? 'block' : 'none';
     if (section === 'dashboard') { loadDashboard(); startMarketTicker(); }
     if (section === 'trade') loadTradeStocks();
     if (section === 'portfolio') { loadPortfolio(); loadTransactions(); }
@@ -408,7 +401,6 @@ function showSection(section) {
 }
 
 function showAuth(type) {
-    document.getElementById('aboutSection').style.display = 'none';
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.getElementById('authSection').style.display = 'block';
     document.getElementById('loginForm').style.display = type === 'login' ? 'block' : 'none';
@@ -464,7 +456,6 @@ async function logout() {
     document.getElementById('authSection').style.display = 'block';
     document.getElementById('navLinks').style.display = 'none';
     document.getElementById('authLinks').style.display = 'flex';
-    document.getElementById('aboutSection').style.display = 'block';
     showAuth('login');
     if (marketInterval) clearInterval(marketInterval);
 }
@@ -475,10 +466,6 @@ async function loadUserTier() {
     currentTier = data.tier || 1;
     const tierNames = {1: 'Bronze', 2: 'Silver', 3: 'Gold'};
     document.getElementById('profileTier').innerText = tierNames[currentTier];
-    updateTierUI();
-}
-
-function updateTierUI() {
     for (let i = 1; i <= 3; i++) {
         const badge = document.getElementById(`tier${i}Badge`);
         if (badge) {
@@ -496,8 +483,8 @@ function updateTierUI() {
 function upgradeTier(tier) {
     if (tier <= currentTier) return;
     const names = {2: 'Silver', 3: 'Gold'};
-    if (confirm(`Upgrade to ${names[tier]} tier? You'll be contacted.`)) {
-        window.location.href = 'mailto:kelsey@charterflow.store?subject=Tier Upgrade Request&body=I want to upgrade to ' + names[tier] + ' tier.';
+    if (confirm(`Upgrade to ${names[tier]} tier? You'll be contacted for payment details.`)) {
+        window.location.href = 'mailto:kelsey@charterflow.store?subject=Tier Upgrade Request&body=I want to upgrade to the ' + names[tier] + ' tier.';
     }
 }
 
@@ -534,7 +521,7 @@ async function loadDashboard() {
         const stocksRes = await fetch('/api/stocks');
         const stocks = await stocksRes.json();
         
-        let marketHtml = '<table class="stock-table"><thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>Change</th></tr></thead><tbody>';
+        let marketHtml = '<table class="stock-table"><thead> hut<th>Symbol</th><th>Name</th><th>Price</th><th>Change</th></thead><tbody>';
         stocks.forEach(s => {
             const change = (Math.random() * 8 - 4).toFixed(2);
             marketHtml += `<tr><td><strong>${s.symbol}</strong></td><td>${s.name}</td><td>$${s.price.toFixed(2)}</td><td class="change-cell ${change >= 0 ? 'price-up' : 'price-down'}">${change >= 0 ? '+' : ''}${change}%</td></tr>`;
@@ -587,6 +574,7 @@ function prepareSell(symbol) {
 
 function closeModal() {
     document.getElementById('confirmModal').style.display = 'none';
+    document.getElementById('modalPassword').value = '';
     pendingSymbol = null;
 }
 
@@ -618,7 +606,6 @@ async function confirmTrade() {
         alert('Error: ' + data.error);
     }
     closeModal();
-    document.getElementById('modalPassword').value = '';
 }
 
 async function loadPortfolio() {
@@ -654,88 +641,11 @@ async function loadTransactions() {
             document.getElementById('transactionsList').innerHTML = '<p style="text-align:center; padding:1rem;">No transactions yet</p>';
             return;
         }
-        let html = '<table class="stock-table"><thead><tr><th>Date</th><th>Symbol</th><th>Type</th><th>Shares</th><th>Price</th><th>Total</th></thead><tbody>';
+        let html = '<table class="stock-table"><thead><tr><th>Date</th><th>Symbol</th><th>Type</th><th>Shares</th><th>Price</th><th>Total</th></tr></thead><tbody>';
         transactions.slice(0, 10).forEach(t => {
             html += `<tr>
                 <td>${new Date(t.date).toLocaleDateString()}</td>
                 <td><strong>${t.symbol}</strong></td>
                 <td style="color:${t.type === 'BUY' ? '#00ff88' : '#ff3b30'}">${t.type}</td>
                 <td>${t.shares}</td>
-                <td>$${t.price.toFixed(2)}</td>
-                <td>$${t.total.toFixed(2)}</td>
-            </tr>`;
-        });
-        html += '</tbody></table>';
-        document.getElementById('transactionsList').innerHTML = html;
-    } catch(e) { console.error(e); }
-}
-
-async function loadProfile() {
-    try {
-        const res = await fetch('/api/user');
-        const user = await res.json();
-        const initials = (user.username || 'U').substring(0, 2).toUpperCase();
-        document.getElementById('userAvatar').innerText = initials;
-        document.getElementById('profileName').innerText = user.username;
-        document.getElementById('profileEmail').innerText = user.email;
-        document.getElementById('editUsername').value = user.username;
-        document.getElementById('editEmail').value = user.email;
-        document.getElementById('profileCash').innerText = `$${(user.cash || 0).toLocaleString()}`;
-        document.getElementById('profileNetWorth').innerText = `$${(user.totalValue || 0).toLocaleString()}`;
-        
-        const tradesRes = await fetch('/api/transactions');
-        const trades = await tradesRes.json();
-        document.getElementById('statTrades').innerText = trades.length;
-        
-        const portRes = await fetch('/api/portfolio');
-        const port = await portRes.json();
-        document.getElementById('statHoldings').innerText = port.length;
-        
-        await loadUserTier();
-    } catch(e) { console.error(e); }
-}
-
-async function updateProfile() {
-    const username = document.getElementById('editUsername').value;
-    const email = document.getElementById('editEmail').value;
-    const res = await fetch('/api/user/profile', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email })
-    });
-    const data = await res.json();
-    if (data.success) {
-        alert('Profile updated');
-        loadProfile();
-    } else {
-        alert('Update failed');
-    }
-}
-
-async function changePassword() {
-    const current = document.getElementById('oldPassword').value;
-    const newPass = document.getElementById('newPassword1').value;
-    const confirm = document.getElementById('newPassword2').value;
-    if (!current || !newPass) { alert('Fill all fields'); return; }
-    if (newPass !== confirm) { alert('Passwords do not match'); return; }
-    const res = await fetch('/api/user/password', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currentPassword: current, newPassword: newPass })
-    });
-    const data = await res.json();
-    if (data.success) {
-        alert('Password updated');
-        document.getElementById('oldPassword').value = '';
-        document.getElementById('newPassword1').value = '';
-        document.getElementById('newPassword2').value = '';
-    } else {
-        alert('Current password incorrect');
-    }
-}
-
-// Make upgradeTier globally available
-window.upgradeTier = upgradeTier;
-</script>
-</body>
-</html>
+                <td>$${t.price.toFixed(2)}
