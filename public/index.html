@@ -2,650 +2,395 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Apex Holdings - Professional Trading Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Holdings</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: system-ui, -apple-system, sans-serif;
             background: #0a0c10;
             color: #e4e6eb;
-            overflow-x: hidden;
-        }
-        .bg-grid {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            background: radial-gradient(circle at 30% 40%, rgba(0, 255, 100, 0.03) 0%, transparent 70%);
+            padding: 1rem;
         }
         .navbar {
-            background: rgba(10, 12, 16, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 255, 100, 0.2);
-            padding: 0.8rem 1rem;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-        }
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
+            background: #0a0c10;
+            border-bottom: 1px solid #00ff88;
+            padding: 1rem;
+            margin-bottom: 1rem;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
-        .logo {
-            font-size: 1.3rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #00ff88, #0066ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-        }
-        .hamburger span {
-            width: 25px;
-            height: 2px;
-            background: #00ff88;
-            transition: 0.3s;
-        }
-        .nav-links {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
-        .nav-links a, .nav-links button {
-            color: #8e9aaf;
+        .navbar a, .navbar button {
+            color: #00ff88;
             text-decoration: none;
-            cursor: pointer;
-            font-size: 0.85rem;
             background: none;
             border: none;
+            cursor: pointer;
+            font-size: 1rem;
         }
-        .nav-links button {
-            background: linear-gradient(135deg, #00ff88, #00cc66);
-            padding: 0.4rem 1rem;
-            border-radius: 6px;
-            color: #0a0c10;
-            font-weight: 600;
-        }
-        @media (max-width: 768px) {
-            .hamburger { display: flex; }
-            .nav-links {
-                position: fixed;
-                top: 0;
-                right: -100%;
-                height: 100vh;
-                width: 70%;
-                background: rgba(10, 12, 16, 0.98);
-                flex-direction: column;
-                justify-content: center;
-                padding: 2rem;
-                transition: 0.3s;
-            }
-            .nav-links.active { right: 0; }
-        }
-        .section { display: none; padding: 5rem 1rem 2rem; min-height: 100vh; }
-        .section.active { display: block; }
-        .container { max-width: 1200px; margin: 0 auto; }
+        .page { display: none; }
+        .page.active { display: block; }
         .card {
-            background: rgba(16, 18, 22, 0.9);
-            border: 1px solid rgba(0, 255, 100, 0.1);
-            border-radius: 20px;
-            padding: 1.2rem;
-            margin-bottom: 1.2rem;
+            background: #1a1c22;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .btn {
+            background: #00ff88;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-danger { background: #ff3b30; color: white; }
+        input {
+            background: #2a2c32;
+            border: 1px solid #00ff88;
+            padding: 0.5rem;
+            border-radius: 8px;
+            color: white;
+            margin: 0.5rem 0;
         }
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2,1fr);
             gap: 1rem;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
         }
         @media (min-width: 768px) {
-            .stats-grid { grid-template-columns: repeat(4, 1fr); }
-            .card { padding: 1.5rem; }
+            .stats-grid { grid-template-columns: repeat(4,1fr); }
         }
         .stat-card {
-            background: linear-gradient(135deg, rgba(0, 255, 100, 0.05), rgba(0, 102, 255, 0.05));
-            border: 1px solid rgba(0, 255, 100, 0.15);
-            border-radius: 16px;
+            background: #2a2c32;
             padding: 1rem;
+            border-radius: 12px;
             text-align: center;
         }
-        .stat-label { font-size: 0.7rem; text-transform: uppercase; color: #8e9aaf; }
-        .stat-value { font-size: 1.3rem; font-weight: 700; color: #00ff88; }
-        .tier-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        @media (min-width: 768px) { .tier-grid { grid-template-columns: repeat(3, 1fr); } }
-        .tier-card {
-            background: linear-gradient(135deg, rgba(0, 255, 100, 0.05), rgba(0, 102, 255, 0.05));
-            border: 1px solid rgba(0, 255, 100, 0.2);
-            border-radius: 16px;
-            padding: 1rem;
-            text-align: center;
-            cursor: pointer;
-        }
-        .tier-card.current { border-color: #00ff88; }
-        .tier-name { font-size: 1.2rem; font-weight: 700; color: #00ff88; }
-        .upgrade-btn {
-            background: linear-gradient(135deg, #00ff88, #00cc66);
-            padding: 0.3rem 1rem;
-            border-radius: 20px;
-            color: #0a0c10;
-            font-size: 0.7rem;
-            display: inline-block;
-            cursor: pointer;
-            margin-top: 0.5rem;
-        }
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 2000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(0,255,136,0.2);
-            border-top: 3px solid #00ff88;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #00ff88; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 0.5rem; text-align: left; border-bottom: 1px solid #333; }
+        .price-up { color: #00ff88; }
+        .price-down { color: #ff3b30; }
+        .trade-input { width: 70px; padding: 0.3rem; }
         .modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 2000;
+            background: rgba(0,0,0,0.9);
             display: none;
             justify-content: center;
             align-items: center;
         }
         .modal-content {
-            background: rgba(20,22,27,0.95);
+            background: #1a1c22;
             border: 1px solid #00ff88;
-            border-radius: 20px;
+            border-radius: 12px;
             padding: 1.5rem;
             width: 90%;
-            max-width: 350px;
+            max-width: 300px;
             text-align: center;
         }
-        .modal input {
-            width: 100%;
-            padding: 0.8rem;
-            margin: 1rem 0;
-            background: #1a1c22;
-            border: 1px solid rgba(0,255,100,0.2);
-            border-radius: 10px;
-            color: white;
-        }
-        .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 2rem; }
-        .hero h1 { font-size: 2rem; background: linear-gradient(135deg, #fff, #00ff88); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .features-grid, .team-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin: 1.5rem 0; }
-        @media (min-width: 768px) { .features-grid, .team-grid { grid-template-columns: repeat(3, 1fr); } }
-        .feature-card, .team-card {
-            background: rgba(16,18,22,0.9);
-            border: 1px solid rgba(0,255,100,0.1);
-            border-radius: 16px;
-            padding: 1.2rem;
-            text-align: center;
-        }
-        .team-avatar {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #00ff88, #0066ff);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 0.8rem;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #0a0c10;
-        }
-        .btn {
-            background: linear-gradient(135deg, #00ff88, #00cc66);
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .btn-danger { background: linear-gradient(135deg, #ff3b30, #cc2f24); color: white; }
-        .trade-input {
-            background: #1a1c22;
-            border: 1px solid rgba(0,255,100,0.2);
-            border-radius: 8px;
-            padding: 0.4rem;
-            color: white;
-            width: 80px;
-        }
-        .stock-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        .stock-table th, .stock-table td { padding: 0.5rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .price-up { color: #00ff88; }
-        .price-down { color: #ff3b30; }
-        .form-group { margin-bottom: 0.8rem; }
-        .form-group input {
-            width: 100%;
-            padding: 0.7rem;
-            background: #1a1c22;
-            border: 1px solid rgba(0,255,100,0.2);
-            border-radius: 10px;
-            color: white;
-        }
-        .auth-container {
-            max-width: 400px;
-            margin: 5rem auto;
-            background: rgba(16,18,22,0.95);
-            border: 1px solid rgba(0,255,100,0.2);
-            border-radius: 24px;
-            padding: 1.5rem;
-        }
-        .alert { padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; display: none; }
-        .alert.success { background: rgba(0,255,100,0.1); border: 1px solid #00ff88; color: #00ff88; display: block; }
-        .alert.error { background: rgba(255,59,48,0.1); border: 1px solid #ff3b30; color: #ff3b30; display: block; }
-        .avatar {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #00ff88, #0066ff);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #0a0c10;
-        }
+        .auth-box { max-width: 400px; margin: 2rem auto; padding: 2rem; background: #1a1c22; border-radius: 12px; }
     </style>
 </head>
 <body>
-<div class="bg-grid"></div>
 
-<nav class="navbar">
-    <div class="nav-container">
-        <div class="logo">APEX HOLDINGS</div>
-        <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
-        <div class="nav-links" id="navLinks" style="display: none;">
-            <a onclick="showSection('dashboard')">Dashboard</a>
-            <a onclick="showSection('trade')">Trade</a>
-            <a onclick="showSection('portfolio')">Portfolio</a>
-            <a onclick="showSection('profile')">Profile</a>
-            <a onclick="showSection('about')">About</a>
-            <button onclick="logout()">Exit</button>
-        </div>
-        <div class="nav-links" id="authLinks">
-            <a onclick="showAuth('login')">Sign In</a>
-            <button onclick="showAuth('register')">Open Account</button>
-        </div>
+<div class="navbar">
+    <div class="logo" style="font-size:1.5rem; font-weight:bold; color:#00ff88;">APEX</div>
+    <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <a onclick="showPage('dashboard')">Dashboard</a>
+        <a onclick="showPage('trade')">Trade</a>
+        <a onclick="showPage('portfolio')">Portfolio</a>
+        <a onclick="showPage('profile')">Profile</a>
+        <button onclick="logout()">Logout</button>
     </div>
-</nav>
+</div>
 
-<div id="loadingOverlay" class="loading-overlay"><div class="loading-spinner"></div><div class="loading-text">Loading...</div></div>
-<div id="confirmModal" class="modal"><div class="modal-content"><h3 id="modalTitle">Confirm</h3><p id="modalMessage"></p><input type="password" id="modalPassword" placeholder="Enter password"><div class="modal-buttons"><button class="btn" onclick="confirmTrade()">Confirm</button><button class="btn-danger" onclick="closeModal()">Cancel</button></div></div></div>
-
-<!-- About Page -->
-<div id="aboutSection" class="section active">
-    <div class="hero"><div><h1>Trade Like an Institution</h1><p>Professional stock simulation • Zero risk • Learn to trade</p><button class="btn" onclick="showAuth('register')">Start Trading →</button></div></div>
-    <div class="container">
-        <div class="features-grid">
-            <div class="feature-card"><strong>📊 Real-time Data</strong><br>Live market prices with random changes</div>
-            <div class="feature-card"><strong>💰 $0 Starting Capital</strong><br>Deposit to begin trading</div>
-            <div class="feature-card"><strong>🏆 3 Tier System</strong><br>Bronze → Silver → Gold</div>
-        </div>
-        <div class="card"><h2>Our Leadership</h2><div class="team-grid"><div class="team-card"><div class="team-avatar">MK</div><div class="team-name">Marcus Kelsey</div><div>CEO & Founder</div><div class="team-bio">Former Goldman Sachs VP</div></div><div class="team-card"><div class="team-avatar">SR</div><div class="team-name">Sarah Rodriguez</div><div>CTO</div><div class="team-bio">Ex-Microsoft Architect</div></div><div class="team-card"><div class="team-avatar">JC</div><div class="team-name">James Chen</div><div>Head of Education</div><div class="team-bio">CFA Instructor</div></div></div></div>
-        <div class="card"><h2>Contact Support</h2><p>Email: kelsey@charterflow.store<br>24/7 Support</p></div>
+<!-- Auth Page -->
+<div id="authPage" class="page active">
+    <div class="auth-box">
+        <h2 id="authTitle">Login</h2>
+        <div id="authMsg" style="color:#ff3b30; margin-bottom:1rem;"></div>
+        <input type="text" id="authUsername" placeholder="Username" style="width:100%;"><br>
+        <input type="password" id="authPassword" placeholder="Password" style="width:100%;"><br>
+        <button class="btn" style="width:100%; margin-top:1rem;" onclick="handleAuth()">Login</button>
+        <p style="margin-top:1rem; text-align:center;"><a onclick="toggleMode()" style="color:#00ff88; cursor:pointer;">Create Account</a></p>
     </div>
 </div>
 
 <!-- Dashboard -->
-<div id="dashboardSection" class="section">
-    <div class="container">
-        <div class="stats-grid">
-            <div class="stat-card"><div class="stat-label">Cash</div><div class="stat-value" id="cashBalance">$0</div></div>
-            <div class="stat-card"><div class="stat-label">Portfolio</div><div class="stat-value" id="portfolioValue">$0</div></div>
-            <div class="stat-card"><div class="stat-label">Net Worth</div><div class="stat-value" id="totalValue">$0</div></div>
-            <div class="stat-card"><div class="stat-label">Today's Change</div><div class="stat-value" id="dailyChange">$0</div></div>
-        </div>
-        <div class="card"><h2>💰 Cash Management</h2><div style="display:flex; gap:0.5rem; flex-wrap:wrap;"><div style="flex:1"><input type="number" id="cashAmount" placeholder="Amount" style="width:100%; padding:0.6rem; background:#1a1c22; border:1px solid rgba(0,255,100,0.2); border-radius:8px; color:white;"><div style="display:flex; gap:0.5rem; margin-top:0.5rem;"><button class="btn" style="flex:1" onclick="requestDeposit()">+ Deposit</button><button class="btn-danger" style="flex:1" onclick="requestWithdraw()">- Withdraw</button></div></div><div style="flex:1; background:rgba(0,255,100,0.05); border-radius:12px; padding:0.8rem;"><div class="stat-label">AVAILABLE CASH</div><div style="font-size:1.2rem; font-weight:bold; color:#00ff88;" id="availableCash">$0</div></div></div></div>
-        <div class="card"><h2>🏆 Account Tiers</h2><div class="tier-grid" id="tierGrid"><div class="tier-card" onclick="upgradeTier(1)"><div class="tier-name">🥉 Bronze</div><div class="tier-benefits">$1,000 capital</div><div id="tier1Badge" class="upgrade-btn">Current</div></div><div class="tier-card" onclick="upgradeTier(2)"><div class="tier-name">🥈 Silver</div><div class="tier-benefits">$5,000 capital</div><div id="tier2Badge" class="upgrade-btn">Upgrade</div></div><div class="tier-card" onclick="upgradeTier(3)"><div class="tier-name">🥇 Gold</div><div class="tier-benefits">$15,000 capital</div><div id="tier3Badge" class="upgrade-btn">Upgrade</div></div></div></div>
-        <div class="card"><h2>📊 Market Overview</h2><div id="marketData"></div></div>
+<div id="dashboardPage" class="page">
+    <div class="stats-grid">
+        <div class="stat-card"><div class="stat-value" id="cashVal">$0</div><div>Cash</div></div>
+        <div class="stat-card"><div class="stat-value" id="portVal">$0</div><div>Portfolio</div></div>
+        <div class="stat-card"><div class="stat-value" id="totalVal">$0</div><div>Net Worth</div></div>
+        <div class="stat-card"><div class="stat-value" id="tierVal">Bronze</div><div>Tier</div></div>
     </div>
+    <div class="card"><h3>💰 Cash</h3><input type="number" id="amountInput" placeholder="Amount"><button class="btn" onclick="deposit()">Deposit</button><button class="btn-danger" onclick="withdraw()">Withdraw</button></div>
+    <div class="card"><h3>📊 Market</h3><div id="marketList"></div></div>
 </div>
 
 <!-- Trade -->
-<div id="tradeSection" class="section">
-    <div class="container">
-        <div class="card"><h2>💹 Execute Trades</h2><div id="tradeAlert" class="alert"></div><div id="tradeStocks"></div></div>
-    </div>
+<div id="tradePage" class="page">
+    <div class="card"><h3>💹 Trade</h3><div id="tradeList"></div></div>
 </div>
 
 <!-- Portfolio -->
-<div id="portfolioSection" class="section">
-    <div class="container">
-        <div class="card"><h2>📋 Your Holdings</h2><div id="portfolioList"></div></div>
-        <div class="card"><h2>🕒 Recent Transactions</h2><div id="transactionsList"></div></div>
-    </div>
+<div id="portfolioPage" class="page">
+    <div class="card"><h3>📋 Holdings</h3><div id="holdingsList"></div></div>
+    <div class="card"><h3>📜 History</h3><div id="historyList"></div></div>
 </div>
 
 <!-- Profile -->
-<div id="profileSection" class="section">
-    <div class="container">
-        <div class="card">
-            <div class="avatar" id="userAvatar"></div>
-            <h2 id="profileName" style="text-align:center"></h2>
-            <p id="profileEmail" style="text-align:center; color:#8e9aaf"></p>
-            <p style="text-align:center; margin-top:0.5rem">Tier: <strong id="profileTier">Bronze</strong></p>
-            <div class="stats-grid" style="margin-top:1rem">
-                <div class="stat-card"><div class="stat-label">Trades</div><div class="stat-value" id="statTrades">0</div></div>
-                <div class="stat-card"><div class="stat-label">Holdings</div><div class="stat-value" id="statHoldings">0</div></div>
-                <div class="stat-card"><div class="stat-label">Cash</div><div class="stat-value" id="profileCash">$0</div></div>
-                <div class="stat-card"><div class="stat-label">Net Worth</div><div class="stat-value" id="profileNetWorth">$0</div></div>
-            </div>
-            <div class="card" style="margin-top:1rem"><h3>Edit Profile</h3><div id="profileAlert" class="alert"></div><div class="form-group"><input type="text" id="editUsername" placeholder="Username"></div><div class="form-group"><input type="email" id="editEmail" placeholder="Email"></div><button class="btn" onclick="updateProfile()">Save Changes</button></div>
-            <div class="card"><h3>Change Password</h3><div class="form-group"><input type="password" id="oldPassword" placeholder="Current password"></div><div class="form-group"><input type="password" id="newPassword1" placeholder="New password"></div><div class="form-group"><input type="password" id="newPassword2" placeholder="Confirm"></div><button class="btn" onclick="changePassword()">Update Password</button></div>
-        </div>
-    </div>
+<div id="profilePage" class="page">
+    <div class="card"><h3>👤 Profile</h3><input type="text" id="editName" placeholder="Username"><input type="email" id="editEmail" placeholder="Email"><button class="btn" onclick="updateProfile()">Update</button></div>
+    <div class="card"><h3>🔒 Password</h3><input type="password" id="oldPwd" placeholder="Current"><input type="password" id="newPwd" placeholder="New"><input type="password" id="confirmPwd" placeholder="Confirm"><button class="btn" onclick="changePwd()">Change</button></div>
 </div>
 
-<!-- Auth -->
-<div id="authSection" style="display:none">
-    <div id="loginForm" class="auth-container"><h2>Welcome Back</h2><div id="loginAlert" class="alert"></div><div class="form-group"><input type="text" id="loginUsername" placeholder="Username"></div><div class="form-group"><input type="password" id="loginPassword" placeholder="Password"></div><button class="btn" style="width:100%" onclick="login()">Sign In</button><p style="margin-top:1rem; text-align:center;">No account? <a onclick="showAuth('register')" style="color:#00ff88">Create one</a></p></div>
-    <div id="registerForm" class="auth-container" style="display:none"><h2>Create Account</h2><div id="registerAlert" class="alert"></div><div class="form-group"><input type="text" id="regUsername" placeholder="Username"></div><div class="form-group"><input type="email" id="regEmail" placeholder="Email"></div><div class="form-group"><input type="password" id="regPassword" placeholder="Password"></div><button class="btn" style="width:100%" onclick="register()">Get Started</button><p style="margin-top:1rem; text-align:center;">Have an account? <a onclick="showAuth('login')" style="color:#00ff88">Sign in</a></p></div>
-</div>
+<!-- Modal -->
+<div id="modal" class="modal"><div class="modal-content"><h3 id="modalTitle">Confirm</h3><p id="modalMsg"></p><input type="password" id="modalPwd" placeholder="Password"><button class="btn" onclick="confirmAction()">Confirm</button><button class="btn-danger" onclick="closeModal()">Cancel</button></div></div>
 
 <script>
+// DATA
+let users = JSON.parse(localStorage.getItem('apex_users') || '[]');
 let currentUser = null;
-let currentTier = 1;
-let marketInterval = null;
+let pendingAction = null;
 
-function toggleMenu() {
-    document.querySelector('.hamburger').classList.toggle('active');
-    document.getElementById('navLinks').classList.toggle('active');
+const stocks = [
+    {symbol:'AAPL', name:'Apple', price:175},
+    {symbol:'GOOGL', name:'Google', price:142},
+    {symbol:'MSFT', name:'Microsoft', price:378},
+    {symbol:'AMZN', name:'Amazon', price:145},
+    {symbol:'TSLA', name:'Tesla', price:245}
+];
+
+function save() { localStorage.setItem('apex_users', JSON.stringify(users)); }
+
+function showPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(page+'Page').classList.add('active');
+    if(page === 'dashboard') loadDashboard();
+    if(page === 'trade') loadTrade();
+    if(page === 'portfolio') { loadHoldings(); loadHistory(); }
+    if(page === 'profile') loadProfile();
 }
 
-function showLoading() { document.getElementById('loadingOverlay').style.display = 'flex'; }
-function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
-
-function showSection(section) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.getElementById(`${section}Section`).classList.add('active');
-    if (section === 'dashboard') { loadDashboard(); startMarketTicker(); }
-    if (section === 'trade') loadTradeStocks();
-    if (section === 'portfolio') { loadPortfolio(); loadTransactions(); }
-    if (section === 'profile') loadProfile();
-    if (document.getElementById('navLinks').classList.contains('active')) toggleMenu();
+// AUTH
+let isLogin = true;
+function toggleMode() {
+    isLogin = !isLogin;
+    document.getElementById('authTitle').innerText = isLogin ? 'Login' : 'Register';
 }
 
-function showAuth(type) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.getElementById('authSection').style.display = 'block';
-    document.getElementById('loginForm').style.display = type === 'login' ? 'block' : 'none';
-    document.getElementById('registerForm').style.display = type === 'register' ? 'block' : 'none';
-}
-
-async function login() {
-    showLoading();
-    const username = document.getElementById('loginUsername').value;
-    const password = document.getElementById('loginPassword').value;
-    const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-    });
-    const data = await res.json();
-    hideLoading();
-    if (data.success) {
-        currentUser = data.user;
-        document.getElementById('authSection').style.display = 'none';
-        document.getElementById('navLinks').style.display = 'flex';
-        document.getElementById('authLinks').style.display = 'none';
-        await loadUserTier();
-        showSection('dashboard');
+function handleAuth() {
+    const username = document.getElementById('authUsername').value;
+    const password = document.getElementById('authPassword').value;
+    if(isLogin) {
+        const user = users.find(u => u.username === username && u.password === password);
+        if(!user) { document.getElementById('authMsg').innerText = 'Invalid'; return; }
+        currentUser = user;
+        showPage('dashboard');
     } else {
-        alert('Invalid credentials');
+        if(users.find(u => u.username === username)) { document.getElementById('authMsg').innerText = 'Username taken'; return; }
+        const newUser = {
+            id: Date.now(),
+            username: username,
+            email: username+'@email.com',
+            password: password,
+            cash: 0,
+            tier: 1,
+            portfolio: [],
+            history: []
+        };
+        users.push(newUser);
+        save();
+        document.getElementById('authMsg').innerText = 'Account created! Login.';
+        isLogin = true;
+        document.getElementById('authTitle').innerText = 'Login';
+        document.getElementById('authPassword').value = '';
     }
 }
 
-async function register() {
-    showLoading();
-    const username = document.getElementById('regUsername').value;
-    const email = document.getElementById('regEmail').value;
-    const password = document.getElementById('regPassword').value;
-    const res = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password })
+function logout() { currentUser = null; showPage('auth'); }
+
+// DASHBOARD
+function loadDashboard() {
+    if(!currentUser) return;
+    let portVal = 0;
+    currentUser.portfolio.forEach(p => {
+        const s = stocks.find(x => x.symbol === p.symbol);
+        if(s) portVal += s.price * p.shares;
     });
-    const data = await res.json();
-    hideLoading();
-    if (data.success) {
-        alert('Account created! Please login.');
-        showAuth('login');
-    } else {
-        alert(data.error || 'Registration failed');
-    }
-}
-
-async function logout() {
-    await fetch('/api/logout', { method: 'POST' });
-    currentUser = null;
-    document.getElementById('authSection').style.display = 'block';
-    document.getElementById('navLinks').style.display = 'none';
-    document.getElementById('authLinks').style.display = 'flex';
-    showAuth('login');
-    if (marketInterval) clearInterval(marketInterval);
-}
-
-async function loadUserTier() {
-    const res = await fetch('/api/user-tier');
-    const data = await res.json();
-    currentTier = data.tier || 1;
-    const tierNames = {1: 'Bronze', 2: 'Silver', 3: 'Gold'};
-    document.getElementById('profileTier').innerText = tierNames[currentTier];
-    for (let i = 1; i <= 3; i++) {
-        const badge = document.getElementById(`tier${i}Badge`);
-        if (badge) {
-            if (i === currentTier) {
-                badge.innerText = 'Current';
-                badge.style.background = '#8e9aaf';
-            } else {
-                badge.innerText = 'Upgrade';
-                badge.style.background = 'linear-gradient(135deg, #00ff88, #00cc66)';
-            }
-        }
-    }
-}
-
-function upgradeTier(tier) {
-    if (tier <= currentTier) return;
-    const names = {2: 'Silver', 3: 'Gold'};
-    if (confirm(`Upgrade to ${names[tier]} tier? You'll be contacted for payment details.`)) {
-        window.location.href = 'mailto:kelsey@charterflow.store?subject=Tier Upgrade Request&body=I want to upgrade to the ' + names[tier] + ' tier.';
-    }
-}
-
-function requestDeposit() { window.location.href = 'mailto:kelsey@charterflow.store?subject=Deposit Request&body=Please provide deposit instructions.'; }
-function requestWithdraw() { window.location.href = 'mailto:kelsey@charterflow.store?subject=Withdrawal Request&body=I would like to withdraw funds.'; }
-
-function startMarketTicker() {
-    if (marketInterval) clearInterval(marketInterval);
-    marketInterval = setInterval(() => {
-        if (document.getElementById('dashboardSection').classList.contains('active')) {
-            updateRandomChanges();
-        }
-    }, 5000);
-}
-
-function updateRandomChanges() {
-    const changeCells = document.querySelectorAll('.change-cell');
-    changeCells.forEach(cell => {
-        const change = (Math.random() * 10 - 5).toFixed(2);
-        cell.innerText = `${change >= 0 ? '+' : ''}${change}%`;
-        cell.className = change >= 0 ? 'price-up change-cell' : 'price-down change-cell';
+    document.getElementById('cashVal').innerText = '$' + currentUser.cash;
+    document.getElementById('portVal').innerText = '$' + portVal;
+    document.getElementById('totalVal').innerText = '$' + (currentUser.cash + portVal);
+    const tiers = {1:'Bronze',2:'Silver',3:'Gold'};
+    document.getElementById('tierVal').innerText = tiers[currentUser.tier];
+    
+    let html = '<table><thead><tr><th>Symbol</th><th>Price</th><th>Change</th></tr></thead><tbody>';
+    stocks.forEach(s => {
+        let change = (Math.random() * 10 - 5).toFixed(2);
+        html += `<tr><td>${s.symbol}</td><td>$${s.price}</td><td class="${change>=0?'price-up':'price-down'}">${change>=0?'+':''}${change}%</td></tr>`;
     });
+    html += '</tbody></table>';
+    document.getElementById('marketList').innerHTML = html;
 }
 
-async function loadDashboard() {
-    try {
-        const res = await fetch('/api/user');
-        const user = await res.json();
-        document.getElementById('cashBalance').innerText = `$${(user.cash || 0).toLocaleString()}`;
-        document.getElementById('portfolioValue').innerText = `$${(user.portfolioValue || 0).toLocaleString()}`;
-        document.getElementById('totalValue').innerText = `$${(user.totalValue || 0).toLocaleString()}`;
-        document.getElementById('availableCash').innerText = `$${(user.cash || 0).toLocaleString()}`;
-        
-        const stocksRes = await fetch('/api/stocks');
-        const stocks = await stocksRes.json();
-        
-        let marketHtml = '<table class="stock-table"><thead> hut<th>Symbol</th><th>Name</th><th>Price</th><th>Change</th></thead><tbody>';
-        stocks.forEach(s => {
-            const change = (Math.random() * 8 - 4).toFixed(2);
-            marketHtml += `<tr><td><strong>${s.symbol}</strong></td><td>${s.name}</td><td>$${s.price.toFixed(2)}</td><td class="change-cell ${change >= 0 ? 'price-up' : 'price-down'}">${change >= 0 ? '+' : ''}${change}%</td></tr>`;
-        });
-        marketHtml += '</tbody></table>';
-        document.getElementById('marketData').innerHTML = marketHtml;
-    } catch(e) { console.error('Dashboard error:', e); }
-}
-
-async function loadTradeStocks() {
-    const res = await fetch('/api/stocks');
-    const stocks = await res.json();
-    let html = '<table class="stock-table"><thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>Qty</th><th>Action</th></tr></thead><tbody>';
+// TRADE
+function loadTrade() {
+    let html = '<table><thead><tr><th>Symbol</th><th>Price</th><th>Shares</th><th>Action</th></tr></thead><tbody>';
     stocks.forEach(s => {
         html += `<tr>
-            <td><strong>${s.symbol}</strong></td>
-            <td>${s.name}</td>
-            <td>$${s.price.toFixed(2)}</td>
-            <td><input type="number" id="shares_${s.symbol}" class="trade-input" placeholder="Shares"></td>
-            <td><button class="btn" style="margin-right:5px; padding:4px 12px;" onclick="prepareBuy('${s.symbol}')">Buy</button><button class="btn-danger" style="padding:4px 12px;" onclick="prepareSell('${s.symbol}')">Sell</button></td>
+            <td>${s.symbol}</td>
+            <td>$${s.price}</td>
+            <td><input type="number" id="qty_${s.symbol}" class="trade-input" value="1"></td>
+            <td><button class="btn" onclick="buyStock('${s.symbol}')">Buy</button> <button class="btn-danger" onclick="sellStock('${s.symbol}')">Sell</button></td>
         </tr>`;
     });
     html += '</tbody></table>';
-    document.getElementById('tradeStocks').innerHTML = html;
+    document.getElementById('tradeList').innerHTML = html;
 }
 
-let pendingSymbol = null, pendingShares = null, pendingIsBuy = null;
-
-function prepareBuy(symbol) {
-    const shares = parseInt(document.getElementById(`shares_${symbol}`).value);
-    if (!shares || shares <= 0) { alert('Enter valid shares'); return; }
-    pendingSymbol = symbol;
-    pendingShares = shares;
-    pendingIsBuy = true;
+function buyStock(symbol) {
+    const qty = parseInt(document.getElementById(`qty_${symbol}`).value);
+    if(!qty) return;
+    const stock = stocks.find(s => s.symbol === symbol);
+    const cost = stock.price * qty;
+    if(currentUser.cash < cost) { alert('Insufficient funds'); return; }
+    pendingAction = { type:'buy', symbol, qty, cost, stockPrice: stock.price };
     document.getElementById('modalTitle').innerText = 'Confirm Buy';
-    document.getElementById('modalMessage').innerText = `Buy ${shares} shares of ${symbol}?`;
-    document.getElementById('confirmModal').style.display = 'flex';
+    document.getElementById('modalMsg').innerText = `Buy ${qty} shares of ${symbol} for $${cost}?`;
+    document.getElementById('modal').style.display = 'flex';
 }
 
-function prepareSell(symbol) {
-    const shares = parseInt(document.getElementById(`shares_${symbol}`).value);
-    if (!shares || shares <= 0) { alert('Enter valid shares'); return; }
-    pendingSymbol = symbol;
-    pendingShares = shares;
-    pendingIsBuy = false;
+function sellStock(symbol) {
+    const qty = parseInt(document.getElementById(`qty_${symbol}`).value);
+    if(!qty) return;
+    const holding = currentUser.portfolio.find(p => p.symbol === symbol);
+    if(!holding || holding.shares < qty) { alert('Not enough shares'); return; }
+    const stock = stocks.find(s => s.symbol === symbol);
+    const value = stock.price * qty;
+    pendingAction = { type:'sell', symbol, qty, value, stockPrice: stock.price };
     document.getElementById('modalTitle').innerText = 'Confirm Sell';
-    document.getElementById('modalMessage').innerText = `Sell ${shares} shares of ${symbol}?`;
-    document.getElementById('confirmModal').style.display = 'flex';
+    document.getElementById('modalMsg').innerText = `Sell ${qty} shares of ${symbol} for $${value}?`;
+    document.getElementById('modal').style.display = 'flex';
+}
+
+function confirmAction() {
+    const pwd = document.getElementById('modalPwd').value;
+    if(currentUser.password !== pwd) { alert('Wrong password'); return; }
+    if(pendingAction.type === 'buy') {
+        currentUser.cash -= pendingAction.cost;
+        const existing = currentUser.portfolio.find(p => p.symbol === pendingAction.symbol);
+        if(existing) {
+            const newShares = existing.shares + pendingAction.qty;
+            const newAvg = ((existing.avgPrice * existing.shares) + (pendingAction.stockPrice * pendingAction.qty)) / newShares;
+            existing.shares = newShares;
+            existing.avgPrice = newAvg;
+        } else {
+            currentUser.portfolio.push({ symbol: pendingAction.symbol, shares: pendingAction.qty, avgPrice: pendingAction.stockPrice });
+        }
+        currentUser.history.unshift({ date: new Date().toISOString(), symbol: pendingAction.symbol, type: 'BUY', shares: pendingAction.qty, price: pendingAction.stockPrice, total: pendingAction.cost });
+    } else {
+        currentUser.cash += pendingAction.value;
+        const holding = currentUser.portfolio.find(p => p.symbol === pendingAction.symbol);
+        holding.shares -= pendingAction.qty;
+        if(holding.shares === 0) currentUser.portfolio = currentUser.portfolio.filter(p => p.symbol !== pendingAction.symbol);
+        currentUser.history.unshift({ date: new Date().toISOString(), symbol: pendingAction.symbol, type: 'SELL', shares: pendingAction.qty, price: pendingAction.stockPrice, total: pendingAction.value });
+    }
+    const index = users.findIndex(u => u.id === currentUser.id);
+    users[index] = currentUser;
+    save();
+    closeModal();
+    loadDashboard();
+    loadHoldings();
+    loadHistory();
+    alert('Trade completed!');
+}
+
+// PORTFOLIO
+function loadHoldings() {
+    if(!currentUser.portfolio.length) { document.getElementById('holdingsList').innerHTML = '<p>No holdings</p>'; return; }
+    let html = '<table><thead><tr><th>Symbol</th><th>Shares</th><th>Avg</th><th>Current</th><th>Value</th><th>P&L</th></tr></thead><tbody>';
+    currentUser.portfolio.forEach(p => {
+        const s = stocks.find(x => x.symbol === p.symbol);
+        const current = s ? s.price : 0;
+        const value = current * p.shares;
+        const pl = (current - p.avgPrice) * p.shares;
+        html += `<tr><td>${p.symbol}</td><td>${p.shares}</td><td>$${p.avgPrice}</td><td>$${current}</td><td>$${value}</td><td class="${pl>=0?'price-up':'price-down'}">${pl>=0?'+':''}$${pl}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    document.getElementById('holdingsList').innerHTML = html;
+}
+
+function loadHistory() {
+    if(!currentUser.history.length) { document.getElementById('historyList').innerHTML = '<p>No transactions</p>'; return; }
+    let html = '<table><thead><tr><th>Date</th><th>Symbol</th><th>Type</th><th>Shares</th><th>Price</th><th>Total</th></tr></thead><tbody>';
+    currentUser.history.slice(0,10).forEach(h => {
+        html += `<tr><td>${new Date(h.date).toLocaleDateString()}</td><td>${h.symbol}</td><td style="color:${h.type==='BUY'?'#00ff88':'#ff3b30'}">${h.type}</td><td>${h.shares}</td><td>$${h.price}</td><td>$${h.total}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    document.getElementById('historyList').innerHTML = html;
+}
+
+// PROFILE
+function loadProfile() {
+    document.getElementById('editName').value = currentUser.username;
+    document.getElementById('editEmail').value = currentUser.email;
+}
+
+function updateProfile() {
+    currentUser.username = document.getElementById('editName').value;
+    currentUser.email = document.getElementById('editEmail').value;
+    const index = users.findIndex(u => u.id === currentUser.id);
+    users[index] = currentUser;
+    save();
+    alert('Profile updated');
+}
+
+function changePwd() {
+    const old = document.getElementById('oldPwd').value;
+    const new1 = document.getElementById('newPwd').value;
+    const new2 = document.getElementById('confirmPwd').value;
+    if(currentUser.password !== old) { alert('Wrong current password'); return; }
+    if(new1 !== new2) { alert('New passwords do not match'); return; }
+    currentUser.password = new1;
+    const index = users.findIndex(u => u.id === currentUser.id);
+    users[index] = currentUser;
+    save();
+    alert('Password changed');
+    document.getElementById('oldPwd').value = '';
+    document.getElementById('newPwd').value = '';
+    document.getElementById('confirmPwd').value = '';
+}
+
+// CASH
+function deposit() {
+    const amt = parseInt(document.getElementById('amountInput').value);
+    if(!amt) return;
+    window.location.href = 'mailto:kelsey@charterflow.store?subject=Deposit Request&body=I want to deposit $' + amt;
+}
+function withdraw() {
+    const amt = parseInt(document.getElementById('amountInput').value);
+    if(!amt) return;
+    if(amt > currentUser.cash) { alert('Insufficient funds'); return; }
+    window.location.href = 'mailto:kelsey@charterflow.store?subject=Withdrawal Request&body=I want to withdraw $' + amt;
 }
 
 function closeModal() {
-    document.getElementById('confirmModal').style.display = 'none';
-    document.getElementById('modalPassword').value = '';
-    pendingSymbol = null;
+    document.getElementById('modal').style.display = 'none';
+    document.getElementById('modalPwd').value = '';
+    pendingAction = null;
 }
 
-async function confirmTrade() {
-    const password = document.getElementById('modalPassword').value;
-    if (!password) { alert('Enter password'); return; }
-    
-    const verifyRes = await fetch('/api/verify-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
-    });
-    const verify = await verifyRes.json();
-    if (!verify.valid) { alert('Wrong password'); return; }
-    
-    const endpoint = pendingIsBuy ? '/api/buy' : '/api/sell';
-    const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ symbol: pendingSymbol, shares: pendingShares })
-    });
-    const data = await res.json();
-    if (data.success) {
-        alert(data.message);
-        loadDashboard();
-        loadPortfolio();
-        loadTransactions();
-    } else {
-        alert('Error: ' + data.error);
-    }
-    closeModal();
-}
-
-async function loadPortfolio() {
-    try {
-        const res = await fetch('/api/portfolio');
-        const portfolio = await res.json();
-        if (!portfolio.length) {
-            document.getElementById('portfolioList').innerHTML = '<p style="text-align:center; padding:2rem;">No holdings. Start trading!</p>';
-            return;
-        }
-        let html = '<table class="stock-table"><thead><tr><th>Symbol</th><th>Shares</th><th>Avg Price</th><th>Current</th><th>Total Value</th><th>P&L</th></tr></thead><tbody>';
-        portfolio.forEach(p => {
-            const pl = p.gainLoss || 0;
-            html += `<tr>
-                <td><strong>${p.symbol}</strong></td>
-                <td>${p.shares}</td>
-                <td>$${(p.avg_price || 0).toFixed(2)}</td>
-                <td>$${p.currentPrice.toFixed(2)}</td>
-                <td>$${p.totalValue.toFixed(2)}</td>
-                <td class="${pl >= 0 ? 'price-up' : 'price-down'}">${pl >= 0 ? '+' : ''}$${pl.toFixed(2)}</td>
-            </tr>`;
-        });
-        html += '</tbody></table>';
-        document.getElementById('portfolioList').innerHTML = html;
-    } catch(e) { console.error(e); }
-}
-
-async function loadTransactions() {
-    try {
-        const res = await fetch('/api/transactions');
-        const transactions = await res.json();
-        if (!transactions.length) {
-            document.getElementById('transactionsList').innerHTML = '<p style="text-align:center; padding:1rem;">No transactions yet</p>';
-            return;
-        }
-        let html = '<table class="stock-table"><thead><tr><th>Date</th><th>Symbol</th><th>Type</th><th>Shares</th><th>Price</th><th>Total</th></tr></thead><tbody>';
-        transactions.slice(0, 10).forEach(t => {
-            html += `<tr>
-                <td>${new Date(t.date).toLocaleDateString()}</td>
-                <td><strong>${t.symbol}</strong></td>
-                <td style="color:${t.type === 'BUY' ? '#00ff88' : '#ff3b30'}">${t.type}</td>
-                <td>${t.shares}</td>
-                <td>$${t.price.toFixed(2)}
+// Check session
+if(currentUser) showPage('dashboard');
+else showPage('auth');
+</script>
+</body>
+</html>
