@@ -20,7 +20,6 @@
             overflow-x: hidden;
         }
 
-        /* Animated Background */
         .bg-grid {
             position: fixed;
             top: 0;
@@ -50,7 +49,6 @@
             100% { transform: translate(40px, 40px); }
         }
 
-        /* Navbar */
         .navbar {
             background: rgba(10, 12, 16, 0.95);
             backdrop-filter: blur(20px);
@@ -88,7 +86,6 @@
             font-size: 1.5rem;
         }
 
-        /* Hamburger Menu */
         .hamburger {
             display: none;
             flex-direction: column;
@@ -168,10 +165,8 @@
             .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(8px, 6px); }
             .hamburger.active span:nth-child(2) { opacity: 0; }
             .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(8px, -6px); }
-            .nav-container { padding: 0; }
         }
 
-        /* Pages */
         .page {
             display: none;
             padding: 5rem 1rem 2rem;
@@ -191,7 +186,6 @@
             margin: 0 auto;
         }
 
-        /* Cards */
         .card {
             background: rgba(16, 18, 22, 0.8);
             backdrop-filter: blur(10px);
@@ -213,7 +207,6 @@
             gap: 10px;
         }
 
-        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -250,7 +243,6 @@
             margin-top: 0.3rem;
         }
 
-        /* Tier Cards */
         .tier-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -300,7 +292,6 @@
             cursor: pointer;
         }
 
-        /* Tables */
         .stock-table {
             width: 100%;
             border-collapse: collapse;
@@ -321,7 +312,6 @@
         .price-up { color: #00ff88; }
         .price-down { color: #ff3b30; }
 
-        /* Forms */
         .form-group {
             margin-bottom: 1rem;
         }
@@ -342,7 +332,6 @@
             border-color: #00ff88;
         }
 
-        /* Buttons */
         .btn {
             background: linear-gradient(135deg, #00ff88, #00cc66);
             border: none;
@@ -377,7 +366,6 @@
             text-align: center;
         }
 
-        /* Auth Box */
         .auth-box {
             max-width: 420px;
             margin: 5rem auto;
@@ -394,7 +382,6 @@
             color: #00ff88;
         }
 
-        /* Loading Overlay */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -431,7 +418,6 @@
             font-weight: 500;
         }
 
-        /* Modal */
         .modal {
             position: fixed;
             top: 0;
@@ -483,7 +469,6 @@
             justify-content: center;
         }
 
-        /* Hero Section */
         .hero {
             min-height: 80vh;
             display: flex;
@@ -506,7 +491,6 @@
             .hero h1 { font-size: 2rem; }
         }
 
-        /* Avatar */
         .avatar {
             width: 80px;
             height: 80px;
@@ -542,13 +526,11 @@
     </div>
 </nav>
 
-<!-- Loading Overlay -->
 <div id="loadingOverlay" class="loading-overlay">
     <div class="loading-spinner"></div>
     <div class="loading-text">Loading your portfolio...</div>
 </div>
 
-<!-- Confirm Modal -->
 <div id="confirmModal" class="modal">
     <div class="modal-content">
         <h3 id="modalTitle">Confirm Trade</h3>
@@ -681,22 +663,26 @@
 </div>
 
 <script>
-// Data Storage
+// ==================== LOAD STOCKS FROM LOCALSTORAGE (SYNC WITH ADMIN) ====================
+let stocks = JSON.parse(localStorage.getItem('apex_stocks') || 'null');
+if (!stocks) {
+    stocks = [
+        {symbol: 'AAPL', name: 'Apple Inc.', price: 175.32},
+        {symbol: 'GOOGL', name: 'Alphabet Inc.', price: 142.65},
+        {symbol: 'MSFT', name: 'Microsoft Corp.', price: 378.45},
+        {symbol: 'AMZN', name: 'Amazon.com Inc.', price: 145.78},
+        {symbol: 'TSLA', name: 'Tesla Inc.', price: 245.67},
+        {symbol: 'META', name: 'Meta Platforms', price: 334.56},
+        {symbol: 'NVDA', name: 'NVIDIA Corp.', price: 895.23}
+    ];
+    localStorage.setItem('apex_stocks', JSON.stringify(stocks));
+}
+
+// ==================== DATA STORAGE ====================
 let users = JSON.parse(localStorage.getItem('apex_users') || '[]');
 let currentUser = null;
 let pendingTrade = null;
 let marketInterval = null;
-
-// Stock Data
-const stocks = [
-    {symbol: 'AAPL', name: 'Apple Inc.', price: 175.32},
-    {symbol: 'GOOGL', name: 'Alphabet Inc.', price: 142.65},
-    {symbol: 'MSFT', name: 'Microsoft Corp.', price: 378.45},
-    {symbol: 'AMZN', name: 'Amazon.com Inc.', price: 145.78},
-    {symbol: 'TSLA', name: 'Tesla Inc.', price: 245.67},
-    {symbol: 'META', name: 'Meta Platforms', price: 334.56},
-    {symbol: 'NVDA', name: 'NVIDIA Corp.', price: 895.23}
-];
 
 function save() {
     localStorage.setItem('apex_users', JSON.stringify(users));
@@ -729,7 +715,7 @@ function showPage(page) {
     }, 300);
 }
 
-// Auth
+// ==================== AUTH ====================
 let isLogin = true;
 
 function toggleMode() {
@@ -797,7 +783,7 @@ function logout() {
     showPage('auth');
 }
 
-// Dashboard
+// ==================== DASHBOARD ====================
 function loadDashboard() {
     if (!currentUser) return;
     
@@ -815,7 +801,6 @@ function loadDashboard() {
     document.getElementById('totalVal').innerHTML = '$' + total.toLocaleString();
     document.getElementById('tierVal').innerHTML = tierNames[currentUser.tier];
     
-    // Market with random changes
     let marketHtml = '<table class="stock-table"><thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>24h Change</th></tr></thead><tbody>';
     stocks.forEach(s => {
         const change = (Math.random() * 12 - 6).toFixed(2);
@@ -830,7 +815,6 @@ function loadDashboard() {
     marketHtml += '</tbody></table>';
     document.getElementById('marketList').innerHTML = marketHtml;
     
-    // Start live market ticker
     if (marketInterval) clearInterval(marketInterval);
     marketInterval = setInterval(() => {
         if (document.getElementById('dashboardPage').classList.contains('active')) {
@@ -845,7 +829,7 @@ function loadDashboard() {
     }, 4000);
 }
 
-// Trade
+// ==================== TRADE ====================
 function loadTrade() {
     let html = '<table class="stock-table"><thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>Shares</th><th>Action</th></tr></thead><tbody>';
     stocks.forEach(s => {
@@ -928,7 +912,7 @@ function confirmTrade() {
     alert(`${pendingTrade.type.toUpperCase()} completed!`);
 }
 
-// Portfolio
+// ==================== PORTFOLIO ====================
 function loadHoldings() {
     if (!currentUser.portfolio.length) {
         document.getElementById('holdingsList').innerHTML = '<p style="text-align:center; padding:2rem;"><i class="fas fa-folder-open"></i> No holdings yet. Start trading!</p>';
@@ -973,7 +957,7 @@ function loadHistory() {
     document.getElementById('historyList').innerHTML = html;
 }
 
-// Profile
+// ==================== PROFILE ====================
 function loadProfile() {
     document.getElementById('userAvatar').innerHTML = (currentUser.username.substring(0, 2) || 'U').toUpperCase();
     document.getElementById('profileName').innerHTML = currentUser.username;
@@ -1013,7 +997,7 @@ function changePwd() {
     document.getElementById('confirmPwd').value = '';
 }
 
-// Cash & Tier
+// ==================== CASH & TIER ====================
 function deposit() {
     const amount = parseInt(document.getElementById('amountInput').value);
     if (!amount || amount <= 0) { alert('Enter valid amount'); return; }
@@ -1037,7 +1021,6 @@ function upgradeTier(tier) {
 }
 
 // Check session
-const savedUser = users.find(u => u === currentUser);
 if (currentUser) showPage('dashboard');
 </script>
 </body>
