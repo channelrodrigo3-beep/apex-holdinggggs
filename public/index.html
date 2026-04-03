@@ -2,307 +2,922 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Holdings</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Apex Holdings | Professional Trading Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', sans-serif;
             background: #0a0c10;
             color: #e4e6eb;
-            padding: 1rem;
+            overflow-x: hidden;
         }
+
+        /* Animated Background */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at 30% 40%, rgba(0, 255, 100, 0.03) 0%, transparent 70%);
+        }
+
+        .bg-grid::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 100, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 100, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: moveGrid 30s linear infinite;
+        }
+
+        @keyframes moveGrid {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
+        }
+
+        /* Navbar */
         .navbar {
-            background: #0a0c10;
-            border-bottom: 1px solid #00ff88;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
+            background: rgba(10, 12, 16, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 255, 100, 0.2);
+            padding: 1rem 1.5rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
         }
-        .navbar a, .navbar button {
-            color: #00ff88;
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00ff88, #0066ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo i {
+            background: linear-gradient(135deg, #00ff88, #0066ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.5rem;
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .hamburger span {
+            width: 28px;
+            height: 2px;
+            background: #00ff88;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a, .nav-links button {
+            color: #8e9aaf;
             text-decoration: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s;
             background: none;
             border: none;
-            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links a i, .nav-links button i {
             font-size: 1rem;
         }
-        .page { display: none; }
+
+        .nav-links a:hover, .nav-links button:hover {
+            color: #00ff88;
+        }
+
+        .nav-links button {
+            background: linear-gradient(135deg, #00ff88, #00cc66);
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            color: #0a0c10;
+            font-weight: 600;
+        }
+
+        .nav-links button i {
+            color: #0a0c10;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger { display: flex; }
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: 75%;
+                background: rgba(10, 12, 16, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                justify-content: center;
+                padding: 2rem;
+                gap: 1.5rem;
+                transition: 0.3s;
+                border-left: 1px solid rgba(0,255,100,0.2);
+            }
+            .nav-links.active {
+                right: 0;
+            }
+            .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(8px, 6px); }
+            .hamburger.active span:nth-child(2) { opacity: 0; }
+            .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(8px, -6px); }
+            .nav-container { padding: 0; }
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            padding: 5rem 1rem 2rem;
+            min-height: 100vh;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .page.active { display: block; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Cards */
         .card {
-            background: #1a1c22;
-            border-radius: 12px;
-            padding: 1rem;
+            background: rgba(16, 18, 22, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 100, 0.1);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: rgba(0, 255, 100, 0.3);
+        }
+
+        .card h2, .card h3 {
             margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .btn {
-            background: #00ff88;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-danger { background: #ff3b30; color: white; }
-        input {
-            background: #2a2c32;
-            border: 1px solid #00ff88;
-            padding: 0.5rem;
-            border-radius: 8px;
-            color: white;
-            margin: 0.5rem 0;
-        }
+
+        /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(2,1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
+
         @media (min-width: 768px) {
-            .stats-grid { grid-template-columns: repeat(4,1fr); }
+            .stats-grid { grid-template-columns: repeat(4, 1fr); }
         }
+
         .stat-card {
-            background: #2a2c32;
-            padding: 1rem;
-            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(0, 255, 100, 0.05), rgba(0, 102, 255, 0.05));
+            border: 1px solid rgba(0, 255, 100, 0.15);
+            border-radius: 16px;
+            padding: 1.2rem;
             text-align: center;
+            transition: transform 0.2s;
         }
-        .stat-value { font-size: 1.5rem; font-weight: bold; color: #00ff88; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 0.5rem; text-align: left; border-bottom: 1px solid #333; }
+
+        .stat-card:hover { transform: translateY(-2px); }
+
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #00ff88;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8e9aaf;
+            margin-top: 0.3rem;
+        }
+
+        /* Tier Cards */
+        .tier-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .tier-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .tier-card {
+            background: linear-gradient(135deg, rgba(0, 255, 100, 0.05), rgba(0, 102, 255, 0.05));
+            border: 1px solid rgba(0, 255, 100, 0.2);
+            border-radius: 16px;
+            padding: 1.2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tier-card:hover {
+            transform: translateY(-3px);
+            border-color: #00ff88;
+        }
+
+        .tier-card.current {
+            border-color: #00ff88;
+            background: linear-gradient(135deg, rgba(0, 255, 100, 0.15), rgba(0, 102, 255, 0.15));
+        }
+
+        .tier-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #00ff88;
+        }
+
+        .upgrade-btn {
+            background: linear-gradient(135deg, #00ff88, #00cc66);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            color: #0a0c10;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 0.5rem;
+            cursor: pointer;
+        }
+
+        /* Tables */
+        .stock-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .stock-table th, .stock-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .stock-table th {
+            color: #00ff88;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+
         .price-up { color: #00ff88; }
         .price-down { color: #ff3b30; }
-        .trade-input { width: 70px; padding: 0.3rem; }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(26, 28, 34, 0.9);
+            border: 1px solid rgba(0, 255, 100, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00ff88;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #00ff88, #00cc66);
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 10px;
+            color: #0a0c10;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0,255,136,0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff3b30, #cc2f24);
+            color: white;
+        }
+
+        .trade-input {
+            background: rgba(26, 28, 34, 0.9);
+            border: 1px solid rgba(0, 255, 100, 0.2);
+            border-radius: 8px;
+            padding: 0.4rem;
+            color: white;
+            width: 80px;
+            text-align: center;
+        }
+
+        /* Auth Box */
+        .auth-box {
+            max-width: 420px;
+            margin: 5rem auto;
+            background: rgba(16, 18, 22, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 255, 100, 0.2);
+            border-radius: 28px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .auth-box h2 {
+            margin-bottom: 1.5rem;
+            color: #00ff88;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 255, 136, 0.2);
+            border-top: 3px solid #00ff88;
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 1rem;
+            color: #00ff88;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Modal */
         .modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
             display: none;
             justify-content: center;
             align-items: center;
         }
+
         .modal-content {
-            background: #1a1c22;
-            border: 1px solid #00ff88;
-            border-radius: 12px;
-            padding: 1.5rem;
+            background: rgba(20, 22, 27, 0.98);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 24px;
+            padding: 1.8rem;
             width: 90%;
-            max-width: 300px;
+            max-width: 340px;
             text-align: center;
+            animation: modalPop 0.3s ease-out;
         }
-        .auth-box { max-width: 400px; margin: 2rem auto; padding: 2rem; background: #1a1c22; border-radius: 12px; }
+
+        @keyframes modalPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-content h3 {
+            color: #00ff88;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 1rem 0;
+            background: #1a1c22;
+            border: 1px solid rgba(0,255,100,0.2);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+        }
+
+        /* Avatar */
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #00ff88, #0066ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #0a0c10;
+        }
     </style>
 </head>
 <body>
 
-<div class="navbar">
-    <div class="logo" style="font-size:1.5rem; font-weight:bold; color:#00ff88;">APEX</div>
-    <div style="display:flex; gap:1rem; flex-wrap:wrap;">
-        <a onclick="showPage('dashboard')">Dashboard</a>
-        <a onclick="showPage('trade')">Trade</a>
-        <a onclick="showPage('portfolio')">Portfolio</a>
-        <a onclick="showPage('profile')">Profile</a>
-        <button onclick="logout()">Logout</button>
+<div class="bg-grid"></div>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo"><i class="fas fa-chart-line"></i> APEX</div>
+        <div class="hamburger" onclick="toggleMenu()">
+            <span></span><span></span><span></span>
+        </div>
+        <div class="nav-links" id="navLinks">
+            <a onclick="showPage('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a onclick="showPage('trade')"><i class="fas fa-exchange-alt"></i> Trade</a>
+            <a onclick="showPage('portfolio')"><i class="fas fa-folder-open"></i> Portfolio</a>
+            <a onclick="showPage('profile')"><i class="fas fa-user"></i> Profile</a>
+            <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Exit</button>
+        </div>
+    </div>
+</nav>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading your portfolio...</div>
+</div>
+
+<!-- Confirm Modal -->
+<div id="confirmModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Confirm Trade</h3>
+        <p id="modalMsg" style="margin: 0.5rem 0;"></p>
+        <input type="password" id="modalPassword" placeholder="Enter your password">
+        <div class="modal-buttons">
+            <button class="btn" onclick="confirmTrade()">Confirm</button>
+            <button class="btn-danger" onclick="closeModal()">Cancel</button>
+        </div>
     </div>
 </div>
 
 <!-- Auth Page -->
 <div id="authPage" class="page active">
     <div class="auth-box">
-        <h2 id="authTitle">Login</h2>
-        <div id="authMsg" style="color:#ff3b30; margin-bottom:1rem;"></div>
-        <input type="text" id="authUsername" placeholder="Username" style="width:100%;"><br>
-        <input type="password" id="authPassword" placeholder="Password" style="width:100%;"><br>
-        <button class="btn" style="width:100%; margin-top:1rem;" onclick="handleAuth()">Login</button>
-        <p style="margin-top:1rem; text-align:center;"><a onclick="toggleMode()" style="color:#00ff88; cursor:pointer;">Create Account</a></p>
+        <i class="fas fa-chart-line" style="font-size: 3rem; color: #00ff88; margin-bottom: 1rem;"></i>
+        <h2 id="authTitle">Welcome Back</h2>
+        <div id="authMsg" style="color: #ff3b30; margin-bottom: 1rem;"></div>
+        <div class="form-group">
+            <input type="text" id="authUsername" placeholder="Username">
+        </div>
+        <div class="form-group">
+            <input type="password" id="authPassword" placeholder="Password">
+        </div>
+        <button class="btn" style="width:100%" onclick="handleAuth()"><i class="fas fa-arrow-right"></i> Sign In</button>
+        <p style="margin-top: 1.5rem; text-align: center;">
+            <a onclick="toggleMode()" style="color: #00ff88; cursor: pointer;">
+                <i class="fas fa-user-plus"></i> Create new account
+            </a>
+        </p>
     </div>
 </div>
 
-<!-- Dashboard -->
+<!-- Dashboard Page -->
 <div id="dashboardPage" class="page">
-    <div class="stats-grid">
-        <div class="stat-card"><div class="stat-value" id="cashVal">$0</div><div>Cash</div></div>
-        <div class="stat-card"><div class="stat-value" id="portVal">$0</div><div>Portfolio</div></div>
-        <div class="stat-card"><div class="stat-value" id="totalVal">$0</div><div>Net Worth</div></div>
-        <div class="stat-card"><div class="stat-value" id="tierVal">Bronze</div><div>Tier</div></div>
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-value" id="cashVal">$0</div><div class="stat-label">Cash Balance</div></div>
+            <div class="stat-card"><div class="stat-value" id="portVal">$0</div><div class="stat-label">Portfolio Value</div></div>
+            <div class="stat-card"><div class="stat-value" id="totalVal">$0</div><div class="stat-label">Net Worth</div></div>
+            <div class="stat-card"><div class="stat-value" id="tierVal">Bronze</div><div class="stat-label">Account Tier</div></div>
+        </div>
+
+        <div class="card">
+            <h3><i class="fas fa-wallet"></i> Cash Management</h3>
+            <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
+                <input type="number" id="amountInput" placeholder="Enter amount" style="flex:1; background:#1a1c22; border:1px solid rgba(0,255,100,0.2); border-radius:12px; padding:0.8rem; color:white;">
+                <button class="btn" onclick="deposit()"><i class="fas fa-plus-circle"></i> Deposit</button>
+                <button class="btn-danger" onclick="withdraw()"><i class="fas fa-minus-circle"></i> Withdraw</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3><i class="fas fa-crown"></i> Upgrade Your Tier</h3>
+            <div class="tier-grid">
+                <div class="tier-card" onclick="upgradeTier(1)">
+                    <div class="tier-name"><i class="fas fa-medal"></i> Bronze</div>
+                    <div>$1,000 Capital</div>
+                    <div id="bronzeBadge" class="upgrade-btn">Current</div>
+                </div>
+                <div class="tier-card" onclick="upgradeTier(2)">
+                    <div class="tier-name"><i class="fas fa-gem"></i> Silver</div>
+                    <div>$5,000 Capital</div>
+                    <div id="silverBadge" class="upgrade-btn">Upgrade</div>
+                </div>
+                <div class="tier-card" onclick="upgradeTier(3)">
+                    <div class="tier-name"><i class="fas fa-crown"></i> Gold</div>
+                    <div>$15,000 Capital</div>
+                    <div id="goldBadge" class="upgrade-btn">Upgrade</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3><i class="fas fa-chart-line"></i> Market Overview</h3>
+            <div id="marketList"></div>
+        </div>
     </div>
-    <div class="card"><h3>💰 Cash</h3><input type="number" id="amountInput" placeholder="Amount"><button class="btn" onclick="deposit()">Deposit</button><button class="btn-danger" onclick="withdraw()">Withdraw</button></div>
-    <div class="card"><h3>📊 Market</h3><div id="marketList"></div></div>
 </div>
 
-<!-- Trade -->
+<!-- Trade Page -->
 <div id="tradePage" class="page">
-    <div class="card"><h3>💹 Trade</h3><div id="tradeList"></div></div>
+    <div class="container">
+        <div class="card">
+            <h3><i class="fas fa-exchange-alt"></i> Execute Trades</h3>
+            <div id="tradeList"></div>
+        </div>
+    </div>
 </div>
 
-<!-- Portfolio -->
+<!-- Portfolio Page -->
 <div id="portfolioPage" class="page">
-    <div class="card"><h3>📋 Holdings</h3><div id="holdingsList"></div></div>
-    <div class="card"><h3>📜 History</h3><div id="historyList"></div></div>
+    <div class="container">
+        <div class="card">
+            <h3><i class="fas fa-chart-pie"></i> Your Holdings</h3>
+            <div id="holdingsList"></div>
+        </div>
+        <div class="card">
+            <h3><i class="fas fa-history"></i> Transaction History</h3>
+            <div id="historyList"></div>
+        </div>
+    </div>
 </div>
 
-<!-- Profile -->
+<!-- Profile Page -->
 <div id="profilePage" class="page">
-    <div class="card"><h3>👤 Profile</h3><input type="text" id="editName" placeholder="Username"><input type="email" id="editEmail" placeholder="Email"><button class="btn" onclick="updateProfile()">Update</button></div>
-    <div class="card"><h3>🔒 Password</h3><input type="password" id="oldPwd" placeholder="Current"><input type="password" id="newPwd" placeholder="New"><input type="password" id="confirmPwd" placeholder="Confirm"><button class="btn" onclick="changePwd()">Change</button></div>
+    <div class="container">
+        <div class="card">
+            <div class="avatar" id="userAvatar">U</div>
+            <h3 id="profileName" style="text-align:center"></h3>
+            <p id="profileEmail" style="text-align:center; color:#8e9aaf"></p>
+            <div class="stats-grid" style="margin-top: 1rem;">
+                <div class="stat-card"><div class="stat-value" id="tradeCount">0</div><div class="stat-label">Total Trades</div></div>
+                <div class="stat-card"><div class="stat-value" id="holdingCount">0</div><div class="stat-label">Holdings</div></div>
+                <div class="stat-card"><div class="stat-value" id="profileCashAmt">$0</div><div class="stat-label">Available Cash</div></div>
+            </div>
+            <div class="form-group"><input type="text" id="editName" placeholder="New Username"></div>
+            <div class="form-group"><input type="email" id="editEmail" placeholder="New Email"></div>
+            <button class="btn" onclick="updateProfile()"><i class="fas fa-save"></i> Update Profile</button>
+            
+            <hr style="margin: 1.5rem 0; border-color: #333;">
+            
+            <h3><i class="fas fa-lock"></i> Security</h3>
+            <div class="form-group"><input type="password" id="oldPwd" placeholder="Current Password"></div>
+            <div class="form-group"><input type="password" id="newPwd" placeholder="New Password"></div>
+            <div class="form-group"><input type="password" id="confirmPwd" placeholder="Confirm Password"></div>
+            <button class="btn" onclick="changePwd()"><i class="fas fa-key"></i> Change Password</button>
+        </div>
+    </div>
 </div>
-
-<!-- Modal -->
-<div id="modal" class="modal"><div class="modal-content"><h3 id="modalTitle">Confirm</h3><p id="modalMsg"></p><input type="password" id="modalPwd" placeholder="Password"><button class="btn" onclick="confirmAction()">Confirm</button><button class="btn-danger" onclick="closeModal()">Cancel</button></div></div>
 
 <script>
-// DATA
+// Data Storage
 let users = JSON.parse(localStorage.getItem('apex_users') || '[]');
 let currentUser = null;
-let pendingAction = null;
+let pendingTrade = null;
+let marketInterval = null;
 
+// Stock Data
 const stocks = [
-    {symbol:'AAPL', name:'Apple', price:175},
-    {symbol:'GOOGL', name:'Google', price:142},
-    {symbol:'MSFT', name:'Microsoft', price:378},
-    {symbol:'AMZN', name:'Amazon', price:145},
-    {symbol:'TSLA', name:'Tesla', price:245}
+    {symbol: 'AAPL', name: 'Apple Inc.', price: 175.32},
+    {symbol: 'GOOGL', name: 'Alphabet Inc.', price: 142.65},
+    {symbol: 'MSFT', name: 'Microsoft Corp.', price: 378.45},
+    {symbol: 'AMZN', name: 'Amazon.com Inc.', price: 145.78},
+    {symbol: 'TSLA', name: 'Tesla Inc.', price: 245.67},
+    {symbol: 'META', name: 'Meta Platforms', price: 334.56},
+    {symbol: 'NVDA', name: 'NVIDIA Corp.', price: 895.23}
 ];
 
-function save() { localStorage.setItem('apex_users', JSON.stringify(users)); }
-
-function showPage(page) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(page+'Page').classList.add('active');
-    if(page === 'dashboard') loadDashboard();
-    if(page === 'trade') loadTrade();
-    if(page === 'portfolio') { loadHoldings(); loadHistory(); }
-    if(page === 'profile') loadProfile();
+function save() {
+    localStorage.setItem('apex_users', JSON.stringify(users));
 }
 
-// AUTH
+function showLoading() {
+    document.getElementById('loadingOverlay').style.display = 'flex';
+}
+
+function hideLoading() {
+    document.getElementById('loadingOverlay').style.display = 'none';
+}
+
+function toggleMenu() {
+    document.querySelector('.hamburger').classList.toggle('active');
+    document.getElementById('navLinks').classList.toggle('active');
+}
+
+function showPage(page) {
+    showLoading();
+    setTimeout(() => {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(page + 'Page').classList.add('active');
+        if (page === 'dashboard') loadDashboard();
+        if (page === 'trade') loadTrade();
+        if (page === 'portfolio') { loadHoldings(); loadHistory(); }
+        if (page === 'profile') loadProfile();
+        if (document.getElementById('navLinks').classList.contains('active')) toggleMenu();
+        hideLoading();
+    }, 300);
+}
+
+// Auth
 let isLogin = true;
+
 function toggleMode() {
     isLogin = !isLogin;
-    document.getElementById('authTitle').innerText = isLogin ? 'Login' : 'Register';
+    document.getElementById('authTitle').innerHTML = isLogin ? 'Welcome Back' : 'Create Account';
+    document.querySelector('#authPage .btn').innerHTML = isLogin ? '<i class="fas fa-arrow-right"></i> Sign In' : '<i class="fas fa-user-plus"></i> Register';
 }
 
 function handleAuth() {
-    const username = document.getElementById('authUsername').value;
+    const username = document.getElementById('authUsername').value.trim();
     const password = document.getElementById('authPassword').value;
-    if(isLogin) {
-        const user = users.find(u => u.username === username && u.password === password);
-        if(!user) { document.getElementById('authMsg').innerText = 'Invalid'; return; }
-        currentUser = user;
-        showPage('dashboard');
-    } else {
-        if(users.find(u => u.username === username)) { document.getElementById('authMsg').innerText = 'Username taken'; return; }
-        const newUser = {
-            id: Date.now(),
-            username: username,
-            email: username+'@email.com',
-            password: password,
-            cash: 0,
-            tier: 1,
-            portfolio: [],
-            history: []
-        };
-        users.push(newUser);
-        save();
-        document.getElementById('authMsg').innerText = 'Account created! Login.';
-        isLogin = true;
-        document.getElementById('authTitle').innerText = 'Login';
-        document.getElementById('authPassword').value = '';
-    }
-}
-
-function logout() { currentUser = null; showPage('auth'); }
-
-// DASHBOARD
-function loadDashboard() {
-    if(!currentUser) return;
-    let portVal = 0;
-    currentUser.portfolio.forEach(p => {
-        const s = stocks.find(x => x.symbol === p.symbol);
-        if(s) portVal += s.price * p.shares;
-    });
-    document.getElementById('cashVal').innerText = '$' + currentUser.cash;
-    document.getElementById('portVal').innerText = '$' + portVal;
-    document.getElementById('totalVal').innerText = '$' + (currentUser.cash + portVal);
-    const tiers = {1:'Bronze',2:'Silver',3:'Gold'};
-    document.getElementById('tierVal').innerText = tiers[currentUser.tier];
     
-    let html = '<table><thead><tr><th>Symbol</th><th>Price</th><th>Change</th></tr></thead><tbody>';
-    stocks.forEach(s => {
-        let change = (Math.random() * 10 - 5).toFixed(2);
-        html += `<tr><td>${s.symbol}</td><td>$${s.price}</td><td class="${change>=0?'price-up':'price-down'}">${change>=0?'+':''}${change}%</td></tr>`;
-    });
-    html += '</tbody></table>';
-    document.getElementById('marketList').innerHTML = html;
+    if (!username || !password) {
+        document.getElementById('authMsg').innerHTML = '<i class="fas fa-exclamation-circle"></i> Fill all fields';
+        return;
+    }
+    
+    showLoading();
+    
+    setTimeout(() => {
+        if (isLogin) {
+            const user = users.find(u => u.username === username && u.password === password);
+            if (!user) {
+                document.getElementById('authMsg').innerHTML = '<i class="fas fa-times-circle"></i> Invalid credentials';
+                hideLoading();
+                return;
+            }
+            currentUser = user;
+            hideLoading();
+            showPage('dashboard');
+        } else {
+            if (users.find(u => u.username === username)) {
+                document.getElementById('authMsg').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Username taken';
+                hideLoading();
+                return;
+            }
+            const newUser = {
+                id: Date.now(),
+                username: username,
+                email: username + '@apex.com',
+                password: password,
+                cash: 0,
+                tier: 1,
+                portfolio: [],
+                history: []
+            };
+            users.push(newUser);
+            save();
+            document.getElementById('authMsg').innerHTML = '<i class="fas fa-check-circle"></i> Account created! Please login.';
+            setTimeout(() => {
+                isLogin = true;
+                document.getElementById('authTitle').innerHTML = 'Welcome Back';
+                document.querySelector('#authPage .btn').innerHTML = '<i class="fas fa-arrow-right"></i> Sign In';
+                document.getElementById('authPassword').value = '';
+                document.getElementById('authMsg').innerHTML = '';
+                hideLoading();
+            }, 1500);
+        }
+    }, 800);
 }
 
-// TRADE
+function logout() {
+    if (marketInterval) clearInterval(marketInterval);
+    currentUser = null;
+    showPage('auth');
+}
+
+// Dashboard
+function loadDashboard() {
+    if (!currentUser) return;
+    
+    let portfolioValue = 0;
+    currentUser.portfolio.forEach(p => {
+        const stock = stocks.find(s => s.symbol === p.symbol);
+        if (stock) portfolioValue += stock.price * p.shares;
+    });
+    
+    const total = currentUser.cash + portfolioValue;
+    const tierNames = {1: 'Bronze', 2: 'Silver', 3: 'Gold'};
+    
+    document.getElementById('cashVal').innerHTML = '$' + currentUser.cash.toLocaleString();
+    document.getElementById('portVal').innerHTML = '$' + portfolioValue.toLocaleString();
+    document.getElementById('totalVal').innerHTML = '$' + total.toLocaleString();
+    document.getElementById('tierVal').innerHTML = tierNames[currentUser.tier];
+    
+    // Market with random changes
+    let marketHtml = '<table class="stock-table"><thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>24h Change</th></tr></thead><tbody>';
+    stocks.forEach(s => {
+        const change = (Math.random() * 12 - 6).toFixed(2);
+        const isPositive = change >= 0;
+        marketHtml += `<tr>
+            <td><strong>${s.symbol}</strong></td>
+            <td>${s.name}</td>
+            <td>$${s.price.toFixed(2)}</td>
+            <td class="${isPositive ? 'price-up' : 'price-down'}">${isPositive ? '+' : ''}${change}%</td>
+        </tr>`;
+    });
+    marketHtml += '</tbody></table>';
+    document.getElementById('marketList').innerHTML = marketHtml;
+    
+    // Start live market ticker
+    if (marketInterval) clearInterval(marketInterval);
+    marketInterval = setInterval(() => {
+        if (document.getElementById('dashboardPage').classList.contains('active')) {
+            const rows = document.querySelectorAll('#marketList .price-up, #marketList .price-down');
+            rows.forEach(row => {
+                const newChange = (Math.random() * 12 - 6).toFixed(2);
+                const isPos = newChange >= 0;
+                row.className = isPos ? 'price-up' : 'price-down';
+                row.innerHTML = `${isPos ? '+' : ''}${newChange}%`;
+            });
+        }
+    }, 4000);
+}
+
+// Trade
 function loadTrade() {
-    let html = '<table><thead><tr><th>Symbol</th><th>Price</th><th>Shares</th><th>Action</th></tr></thead><tbody>';
+    let html = '<table class="stock-table"><thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>Shares</th><th>Action</th></tr></thead><tbody>';
     stocks.forEach(s => {
         html += `<tr>
-            <td>${s.symbol}</td>
-            <td>$${s.price}</td>
-            <td><input type="number" id="qty_${s.symbol}" class="trade-input" value="1"></td>
-            <td><button class="btn" onclick="buyStock('${s.symbol}')">Buy</button> <button class="btn-danger" onclick="sellStock('${s.symbol}')">Sell</button></td>
+            <td><strong>${s.symbol}</strong></td>
+            <td>${s.name}</td>
+            <td>$${s.price.toFixed(2)}</td>
+            <td><input type="number" id="qty_${s.symbol}" class="trade-input" value="1" min="1"></td>
+            <td><button class="btn" onclick="prepareBuy('${s.symbol}')"><i class="fas fa-shopping-cart"></i> Buy</button> <button class="btn-danger" onclick="prepareSell('${s.symbol}')"><i class="fas fa-trash"></i> Sell</button></td>
         </tr>`;
     });
     html += '</tbody></table>';
     document.getElementById('tradeList').innerHTML = html;
 }
 
-function buyStock(symbol) {
+function prepareBuy(symbol) {
     const qty = parseInt(document.getElementById(`qty_${symbol}`).value);
-    if(!qty) return;
+    if (!qty || qty <= 0) { alert('Enter valid shares'); return; }
     const stock = stocks.find(s => s.symbol === symbol);
     const cost = stock.price * qty;
-    if(currentUser.cash < cost) { alert('Insufficient funds'); return; }
-    pendingAction = { type:'buy', symbol, qty, cost, stockPrice: stock.price };
-    document.getElementById('modalTitle').innerText = 'Confirm Buy';
-    document.getElementById('modalMsg').innerText = `Buy ${qty} shares of ${symbol} for $${cost}?`;
-    document.getElementById('modal').style.display = 'flex';
+    if (currentUser.cash < cost) { alert('Insufficient funds'); return; }
+    pendingTrade = { type: 'buy', symbol, qty, cost, price: stock.price };
+    document.getElementById('modalTitle').innerHTML = 'Confirm Buy';
+    document.getElementById('modalMsg').innerHTML = `Buy ${qty} shares of ${symbol} for $${cost.toLocaleString()}?`;
+    document.getElementById('confirmModal').style.display = 'flex';
 }
 
-function sellStock(symbol) {
+function prepareSell(symbol) {
     const qty = parseInt(document.getElementById(`qty_${symbol}`).value);
-    if(!qty) return;
+    if (!qty || qty <= 0) { alert('Enter valid shares'); return; }
     const holding = currentUser.portfolio.find(p => p.symbol === symbol);
-    if(!holding || holding.shares < qty) { alert('Not enough shares'); return; }
+    if (!holding || holding.shares < qty) { alert('Not enough shares'); return; }
     const stock = stocks.find(s => s.symbol === symbol);
     const value = stock.price * qty;
-    pendingAction = { type:'sell', symbol, qty, value, stockPrice: stock.price };
-    document.getElementById('modalTitle').innerText = 'Confirm Sell';
-    document.getElementById('modalMsg').innerText = `Sell ${qty} shares of ${symbol} for $${value}?`;
-    document.getElementById('modal').style.display = 'flex';
+    pendingTrade = { type: 'sell', symbol, qty, value, price: stock.price };
+    document.getElementById('modalTitle').innerHTML = 'Confirm Sell';
+    document.getElementById('modalMsg').innerHTML = `Sell ${qty} shares of ${symbol} for $${value.toLocaleString()}?`;
+    document.getElementById('confirmModal').style.display = 'flex';
 }
 
-function confirmAction() {
-    const pwd = document.getElementById('modalPwd').value;
-    if(currentUser.password !== pwd) { alert('Wrong password'); return; }
-    if(pendingAction.type === 'buy') {
-        currentUser.cash -= pendingAction.cost;
-        const existing = currentUser.portfolio.find(p => p.symbol === pendingAction.symbol);
-        if(existing) {
-            const newShares = existing.shares + pendingAction.qty;
-            const newAvg = ((existing.avgPrice * existing.shares) + (pendingAction.stockPrice * pendingAction.qty)) / newShares;
+function closeModal() {
+    document.getElementById('confirmModal').style.display = 'none';
+    document.getElementById('modalPassword').value = '';
+    pendingTrade = null;
+}
+
+function confirmTrade() {
+    const password = document.getElementById('modalPassword').value;
+    if (currentUser.password !== password) { alert('Wrong password'); return; }
+    
+    if (pendingTrade.type === 'buy') {
+        currentUser.cash -= pendingTrade.cost;
+        const existing = currentUser.portfolio.find(p => p.symbol === pendingTrade.symbol);
+        if (existing) {
+            const newShares = existing.shares + pendingTrade.qty;
+            const newAvg = ((existing.avgPrice * existing.shares) + (pendingTrade.price * pendingTrade.qty)) / newShares;
             existing.shares = newShares;
             existing.avgPrice = newAvg;
         } else {
-            currentUser.portfolio.push({ symbol: pendingAction.symbol, shares: pendingAction.qty, avgPrice: pendingAction.stockPrice });
+            currentUser.portfolio.push({ symbol: pendingTrade.symbol, shares: pendingTrade.qty, avgPrice: pendingTrade.price });
         }
-        currentUser.history.unshift({ date: new Date().toISOString(), symbol: pendingAction.symbol, type: 'BUY', shares: pendingAction.qty, price: pendingAction.stockPrice, total: pendingAction.cost });
+        currentUser.history.unshift({ date: new Date().toISOString(), symbol: pendingTrade.symbol, type: 'BUY', shares: pendingTrade.qty, price: pendingTrade.price, total: pendingTrade.cost });
     } else {
-        currentUser.cash += pendingAction.value;
-        const holding = currentUser.portfolio.find(p => p.symbol === pendingAction.symbol);
-        holding.shares -= pendingAction.qty;
-        if(holding.shares === 0) currentUser.portfolio = currentUser.portfolio.filter(p => p.symbol !== pendingAction.symbol);
-        currentUser.history.unshift({ date: new Date().toISOString(), symbol: pendingAction.symbol, type: 'SELL', shares: pendingAction.qty, price: pendingAction.stockPrice, total: pendingAction.value });
+        currentUser.cash += pendingTrade.value;
+        const holding = currentUser.portfolio.find(p => p.symbol === pendingTrade.symbol);
+        holding.shares -= pendingTrade.qty;
+        if (holding.shares === 0) {
+            currentUser.portfolio = currentUser.portfolio.filter(p => p.symbol !== pendingTrade.symbol);
+        }
+        currentUser.history.unshift({ date: new Date().toISOString(), symbol: pendingTrade.symbol, type: 'SELL', shares: pendingTrade.qty, price: pendingTrade.price, total: pendingTrade.value });
     }
+    
     const index = users.findIndex(u => u.id === currentUser.id);
     users[index] = currentUser;
     save();
@@ -310,87 +925,120 @@ function confirmAction() {
     loadDashboard();
     loadHoldings();
     loadHistory();
-    alert('Trade completed!');
+    alert(`${pendingTrade.type.toUpperCase()} completed!`);
 }
 
-// PORTFOLIO
+// Portfolio
 function loadHoldings() {
-    if(!currentUser.portfolio.length) { document.getElementById('holdingsList').innerHTML = '<p>No holdings</p>'; return; }
-    let html = '<table><thead><tr><th>Symbol</th><th>Shares</th><th>Avg</th><th>Current</th><th>Value</th><th>P&L</th></tr></thead><tbody>';
+    if (!currentUser.portfolio.length) {
+        document.getElementById('holdingsList').innerHTML = '<p style="text-align:center; padding:2rem;"><i class="fas fa-folder-open"></i> No holdings yet. Start trading!</p>';
+        return;
+    }
+    let html = '<table class="stock-table"><thead><tr><th>Symbol</th><th>Shares</th><th>Avg Price</th><th>Current</th><th>Value</th><th>P&L</th></tr></thead><tbody>';
     currentUser.portfolio.forEach(p => {
-        const s = stocks.find(x => x.symbol === p.symbol);
-        const current = s ? s.price : 0;
+        const stock = stocks.find(s => s.symbol === p.symbol);
+        const current = stock ? stock.price : 0;
         const value = current * p.shares;
         const pl = (current - p.avgPrice) * p.shares;
-        html += `<tr><td>${p.symbol}</td><td>${p.shares}</td><td>$${p.avgPrice}</td><td>$${current}</td><td>$${value}</td><td class="${pl>=0?'price-up':'price-down'}">${pl>=0?'+':''}$${pl}</td></tr>`;
+        html += `<tr>
+            <td><strong>${p.symbol}</strong></td>
+            <td>${p.shares}</td>
+            <td>$${p.avgPrice.toFixed(2)}</td>
+            <td>$${current.toFixed(2)}</td>
+            <td>$${value.toFixed(2)}</td>
+            <td class="${pl >= 0 ? 'price-up' : 'price-down'}">${pl >= 0 ? '+' : ''}$${pl.toFixed(2)}</td>
+        </tr>`;
     });
     html += '</tbody></table>';
     document.getElementById('holdingsList').innerHTML = html;
 }
 
 function loadHistory() {
-    if(!currentUser.history.length) { document.getElementById('historyList').innerHTML = '<p>No transactions</p>'; return; }
-    let html = '<table><thead><tr><th>Date</th><th>Symbol</th><th>Type</th><th>Shares</th><th>Price</th><th>Total</th></tr></thead><tbody>';
-    currentUser.history.slice(0,10).forEach(h => {
-        html += `<tr><td>${new Date(h.date).toLocaleDateString()}</td><td>${h.symbol}</td><td style="color:${h.type==='BUY'?'#00ff88':'#ff3b30'}">${h.type}</td><td>${h.shares}</td><td>$${h.price}</td><td>$${h.total}</td></tr>`;
+    if (!currentUser.history.length) {
+        document.getElementById('historyList').innerHTML = '<p style="text-align:center; padding:1rem;"><i class="fas fa-history"></i> No transactions yet</p>';
+        return;
+    }
+    let html = '<table class="stock-table"><thead><tr><th>Date</th><th>Symbol</th><th>Type</th><th>Shares</th><th>Price</th><th>Total</th></tr></thead><tbody>';
+    currentUser.history.slice(0, 15).forEach(h => {
+        html += `<tr>
+            <td>${new Date(h.date).toLocaleDateString()}</td>
+            <td><strong>${h.symbol}</strong></td>
+            <td style="color:${h.type === 'BUY' ? '#00ff88' : '#ff3b30'}">${h.type}</td>
+            <td>${h.shares}</td>
+            <td>$${h.price.toFixed(2)}</td>
+            <td>$${h.total.toFixed(2)}</td>
+        </tr>`;
     });
     html += '</tbody></table>';
     document.getElementById('historyList').innerHTML = html;
 }
 
-// PROFILE
+// Profile
 function loadProfile() {
+    document.getElementById('userAvatar').innerHTML = (currentUser.username.substring(0, 2) || 'U').toUpperCase();
+    document.getElementById('profileName').innerHTML = currentUser.username;
+    document.getElementById('profileEmail').innerHTML = currentUser.email;
+    document.getElementById('tradeCount').innerHTML = currentUser.history.length;
+    document.getElementById('holdingCount').innerHTML = currentUser.portfolio.length;
+    document.getElementById('profileCashAmt').innerHTML = '$' + currentUser.cash.toLocaleString();
     document.getElementById('editName').value = currentUser.username;
     document.getElementById('editEmail').value = currentUser.email;
 }
 
 function updateProfile() {
-    currentUser.username = document.getElementById('editName').value;
-    currentUser.email = document.getElementById('editEmail').value;
+    currentUser.username = document.getElementById('editName').value || currentUser.username;
+    currentUser.email = document.getElementById('editEmail').value || currentUser.email;
     const index = users.findIndex(u => u.id === currentUser.id);
     users[index] = currentUser;
     save();
-    alert('Profile updated');
+    alert('Profile updated!');
+    loadProfile();
 }
 
 function changePwd() {
-    const old = document.getElementById('oldPwd').value;
-    const new1 = document.getElementById('newPwd').value;
-    const new2 = document.getElementById('confirmPwd').value;
-    if(currentUser.password !== old) { alert('Wrong current password'); return; }
-    if(new1 !== new2) { alert('New passwords do not match'); return; }
-    currentUser.password = new1;
+    const oldPwd = document.getElementById('oldPwd').value;
+    const newPwd = document.getElementById('newPwd').value;
+    const confirmPwd = document.getElementById('confirmPwd').value;
+    
+    if (currentUser.password !== oldPwd) { alert('Current password wrong'); return; }
+    if (newPwd !== confirmPwd) { alert('New passwords do not match'); return; }
+    
+    currentUser.password = newPwd;
     const index = users.findIndex(u => u.id === currentUser.id);
     users[index] = currentUser;
     save();
-    alert('Password changed');
+    alert('Password changed!');
     document.getElementById('oldPwd').value = '';
     document.getElementById('newPwd').value = '';
     document.getElementById('confirmPwd').value = '';
 }
 
-// CASH
+// Cash & Tier
 function deposit() {
-    const amt = parseInt(document.getElementById('amountInput').value);
-    if(!amt) return;
-    window.location.href = 'mailto:kelsey@charterflow.store?subject=Deposit Request&body=I want to deposit $' + amt;
-}
-function withdraw() {
-    const amt = parseInt(document.getElementById('amountInput').value);
-    if(!amt) return;
-    if(amt > currentUser.cash) { alert('Insufficient funds'); return; }
-    window.location.href = 'mailto:kelsey@charterflow.store?subject=Withdrawal Request&body=I want to withdraw $' + amt;
+    const amount = parseInt(document.getElementById('amountInput').value);
+    if (!amount || amount <= 0) { alert('Enter valid amount'); return; }
+    window.location.href = 'mailto:kelsey@charterflow.store?subject=Deposit Request&body=I want to deposit $' + amount;
 }
 
-function closeModal() {
-    document.getElementById('modal').style.display = 'none';
-    document.getElementById('modalPwd').value = '';
-    pendingAction = null;
+function withdraw() {
+    const amount = parseInt(document.getElementById('amountInput').value);
+    if (!amount || amount <= 0) { alert('Enter valid amount'); return; }
+    if (amount > currentUser.cash) { alert('Insufficient funds'); return; }
+    window.location.href = 'mailto:kelsey@charterflow.store?subject=Withdrawal Request&body=I want to withdraw $' + amount;
+}
+
+function upgradeTier(tier) {
+    if (tier <= currentUser.tier) return;
+    const tierNames = {2: 'Silver', 3: 'Gold'};
+    const tierCapitals = {2: 5000, 3: 15000};
+    if (confirm(`Upgrade to ${tierNames[tier]} tier? New capital: $${tierCapitals[tier].toLocaleString()}`)) {
+        window.location.href = 'mailto:kelsey@charterflow.store?subject=Tier Upgrade Request&body=I want to upgrade to the ' + tierNames[tier] + ' tier.';
+    }
 }
 
 // Check session
-if(currentUser) showPage('dashboard');
-else showPage('auth');
+const savedUser = users.find(u => u === currentUser);
+if (currentUser) showPage('dashboard');
 </script>
 </body>
 </html>
