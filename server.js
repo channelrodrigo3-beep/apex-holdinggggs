@@ -11,25 +11,26 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(session({
-    secret: 'apex-secret',
+    secret: 'apex-secret-key-2024',
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false }
 }));
 
+// Database connection
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
 
-// Initialize database tables
+// Create tables
 async function initDB() {
     await pool.query(`
         CREATE TABLE IF NOT EXISTS users (
             id SERIAL PRIMARY KEY,
-            username TEXT UNIQUE,
-            email TEXT UNIQUE,
-            password TEXT,
+            username TEXT UNIQUE NOT NULL,
+            email TEXT NOT NULL,
+            password TEXT NOT NULL,
             cash REAL DEFAULT 0,
             tier INTEGER DEFAULT 1,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -39,22 +40,22 @@ async function initDB() {
     await pool.query(`
         CREATE TABLE IF NOT EXISTS portfolio (
             id SERIAL PRIMARY KEY,
-            user_id INTEGER,
-            symbol TEXT,
-            shares INTEGER,
-            avg_price REAL
+            user_id INTEGER REFERENCES users(id),
+            symbol TEXT NOT NULL,
+            shares INTEGER NOT NULL,
+            avg_price REAL NOT NULL
         )
     `);
     
     await pool.query(`
         CREATE TABLE IF NOT EXISTS transactions (
             id SERIAL PRIMARY KEY,
-            user_id INTEGER,
-            symbol TEXT,
-            type TEXT,
-            shares INTEGER,
-            price REAL,
-            total REAL,
+            user_id INTEGER REFERENCES users(id),
+            symbol TEXT NOT NULL,
+            type TEXT NOT NULL,
+            shares INTEGER NOT NULL,
+            price REAL NOT NULL,
+            total REAL NOT NULL,
             date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     `);
@@ -62,13 +63,12 @@ async function initDB() {
     await pool.query(`
         CREATE TABLE IF NOT EXISTS stocks (
             symbol TEXT PRIMARY KEY,
-            name TEXT,
-            price REAL,
-            change REAL DEFAULT 0
+            name TEXT NOT NULL,
+            price REAL NOT NULL
         )
     `);
     
-    // Check if stocks exist, if not, add them
+    // Insert default stocks if empty
     const result = await pool.query("SELECT COUNT(*) FROM stocks");
     if (parseInt(result.rows[0].count) === 0) {
         await pool.query(`
@@ -79,66 +79,79 @@ async function initDB() {
             ('AMZN', 'Amazon.com Inc.', 145.78),
             ('TSLA', 'Tesla Inc.', 245.67),
             ('META', 'Meta Platforms', 334.56),
-            ('NVDA', 'NVIDIA Corp.', 895.23),
-            ('JPM', 'JPMorgan Chase', 185.45),
-            ('V', 'Visa Inc.', 268.34),
-            ('WMT', 'Walmart Inc.', 165.78)
+            ('NVDA', 'NVIDIA Corp.', 895.23)
         `);
     }
 }
 
 initDB();
 
+// Helper function
 async function getStocks() {
     const result = await pool.query("SELECT * FROM stocks");
     return result.rows;
 }
 
-// REGISTER
+// ==================== AUTH ROUTES ====================
 app.post('/api/register', async (req, res) => {
     const { username, email, password } = req.body;
-    const hashed = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
     try {
-        await pool.query("INSERT INTO users (username, email, password, cash) VALUES ($1, $2, $3, 0)", [username, email, hashed]);
+        await pool.query(
+            "INSERT INTO users (username, email, password) VALUES ($1, $2, $3)",
+            [username, email, hashedPassword]
+        );
         res.json({ success: true, message: "Account created!" });
     } catch (err) {
-        res.status(400).json({ error: 'Username or email already exists' });
+        res.status(400).json({ error: "Username already exists" });
     }
 });
 
-// LOGIN
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
+    
     const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
     const user = result.rows[0];
-    if (!user) return res.status(401).json({ error: "Invalid credentials" });
+    
+    if (!user) {
+        return res.status(401).json({ error: "Invalid credentials" });
+    }
+    
     const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(401).json({ error: "Invalid credentials" });
+    if (!valid) {
+        return res.status(401).json({ error: "Invalid credentials" });
+    }
+    
     req.session.userId = user.id;
-    res.json({ success: true, user });
+    res.json({ success: true, user: { id: user.id, username: user.username, email: user.email, cash: user.cash, tier: user.tier } });
 });
 
-// LOGOUT
 app.post('/api/logout', (req, res) => {
     req.session.destroy();
     res.json({ success: true });
 });
 
-// GET USER DATA
 app.get('/api/user', async (req, res) => {
-    if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
-    const user = await pool.query("SELECT * FROM users WHERE id = $1", [req.session.userId]);
+    if (!req.session.userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+    
+    const userResult = await pool.query("SELECT id, username, email, cash, tier FROM users WHERE id = $1", [req.session.userId]);
+    const user = userResult.rows[0];
+    
+    const portfolioResult = await pool.query("SELECT symbol, shares FROM portfolio WHERE user_id = $1", [req.session.userId]);
     const stocks = await getStocks();
-    const portfolio = await pool.query("SELECT symbol, shares FROM portfolio WHERE user_id = $1", [req.session.userId]);
+    
     let portfolioValue = 0;
-    for (const p of portfolio.rows) {
+    for (const p of portfolioResult.rows) {
         const stock = stocks.find(s => s.symbol === p.symbol);
         if (stock) portfolioValue += stock.price * p.shares;
     }
-    res.json({ ...user.rows[0], portfolioValue, totalValue: user.rows[0].cash + portfolioValue });
+    
+    res.json({ ...user, portfolioValue, totalValue: user.cash + portfolioValue });
 });
 
-// GET USER TIER
 app.get('/api/user-tier', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
     const result = await pool.query("SELECT tier FROM users WHERE id = $1", [req.session.userId]);
@@ -148,121 +161,152 @@ app.get('/api/user-tier', async (req, res) => {
     res.json({ tier, name: tierNames[tier], capital: tierCapital[tier] });
 });
 
-// GET STOCKS
+// ==================== STOCK ROUTES ====================
 app.get('/api/stocks', async (req, res) => {
     const stocks = await getStocks();
     res.json(stocks);
 });
 
-// GET PORTFOLIO
 app.get('/api/portfolio', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
-    const portfolio = await pool.query("SELECT symbol, shares, avg_price FROM portfolio WHERE user_id = $1", [req.session.userId]);
+    
+    const portfolioResult = await pool.query("SELECT symbol, shares, avg_price FROM portfolio WHERE user_id = $1", [req.session.userId]);
     const stocks = await getStocks();
-    const enriched = portfolio.rows.map(p => {
+    
+    const enriched = portfolioResult.rows.map(p => {
         const stock = stocks.find(s => s.symbol === p.symbol);
         const currentPrice = stock?.price || 0;
         const totalValue = currentPrice * p.shares;
         const gainLoss = (currentPrice - p.avg_price) * p.shares;
         return { ...p, currentPrice, totalValue, gainLoss };
     });
+    
     res.json(enriched);
 });
 
-// GET TRANSACTIONS
 app.get('/api/transactions', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
-    const result = await pool.query("SELECT * FROM transactions WHERE user_id = $1 ORDER BY date DESC LIMIT 50", [req.session.userId]);
+    
+    const result = await pool.query(
+        "SELECT * FROM transactions WHERE user_id = $1 ORDER BY date DESC LIMIT 50",
+        [req.session.userId]
+    );
     res.json(result.rows);
 });
 
-// BUY
 app.post('/api/buy', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
+    
     const { symbol, shares } = req.body;
-    const stock = await pool.query("SELECT * FROM stocks WHERE symbol = $1", [symbol]);
-    if (!stock.rows[0]) return res.status(400).json({ error: "Stock not found" });
-    const cost = stock.rows[0].price * shares;
-    const user = await pool.query("SELECT cash FROM users WHERE id = $1", [req.session.userId]);
-    if (user.rows[0].cash < cost) return res.status(400).json({ error: "Insufficient funds" });
+    const stockResult = await pool.query("SELECT * FROM stocks WHERE symbol = $1", [symbol]);
+    const stock = stockResult.rows[0];
+    
+    if (!stock) return res.status(400).json({ error: "Stock not found" });
+    
+    const cost = stock.price * shares;
+    const userResult = await pool.query("SELECT cash FROM users WHERE id = $1", [req.session.userId]);
+    
+    if (userResult.rows[0].cash < cost) {
+        return res.status(400).json({ error: "Insufficient funds" });
+    }
     
     await pool.query("UPDATE users SET cash = cash - $1 WHERE id = $2", [cost, req.session.userId]);
     
-    const holding = await pool.query("SELECT * FROM portfolio WHERE user_id = $1 AND symbol = $2", [req.session.userId, symbol]);
-    if (holding.rows.length > 0) {
-        const newShares = holding.rows[0].shares + shares;
-        const newAvg = ((holding.rows[0].avg_price * holding.rows[0].shares) + (stock.rows[0].price * shares)) / newShares;
+    const holdingResult = await pool.query("SELECT * FROM portfolio WHERE user_id = $1 AND symbol = $2", [req.session.userId, symbol]);
+    
+    if (holdingResult.rows.length > 0) {
+        const holding = holdingResult.rows[0];
+        const newShares = holding.shares + shares;
+        const newAvg = ((holding.avg_price * holding.shares) + (stock.price * shares)) / newShares;
         await pool.query("UPDATE portfolio SET shares = $1, avg_price = $2 WHERE user_id = $3 AND symbol = $4", [newShares, newAvg, req.session.userId, symbol]);
     } else {
-        await pool.query("INSERT INTO portfolio (user_id, symbol, shares, avg_price) VALUES ($1, $2, $3, $4)", [req.session.userId, symbol, shares, stock.rows[0].price]);
+        await pool.query("INSERT INTO portfolio (user_id, symbol, shares, avg_price) VALUES ($1, $2, $3, $4)", [req.session.userId, symbol, shares, stock.price]);
     }
     
-    await pool.query("INSERT INTO transactions (user_id, symbol, type, shares, price, total) VALUES ($1, $2, $3, $4, $5, $6)", [req.session.userId, symbol, 'BUY', shares, stock.rows[0].price, cost]);
-    res.json({ success: true, message: `Bought ${shares} shares of ${symbol} at $${stock.rows[0].price}` });
+    await pool.query("INSERT INTO transactions (user_id, symbol, type, shares, price, total) VALUES ($1, $2, $3, $4, $5, $6)", [req.session.userId, symbol, 'BUY', shares, stock.price, cost]);
+    
+    res.json({ success: true, message: `Bought ${shares} shares of ${symbol}` });
 });
 
-// SELL
 app.post('/api/sell', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
+    
     const { symbol, shares } = req.body;
-    const stock = await pool.query("SELECT * FROM stocks WHERE symbol = $1", [symbol]);
-    if (!stock.rows[0]) return res.status(400).json({ error: "Stock not found" });
-    const value = stock.rows[0].price * shares;
-    const holding = await pool.query("SELECT * FROM portfolio WHERE user_id = $1 AND symbol = $2", [req.session.userId, symbol]);
-    if (!holding.rows[0] || holding.rows[0].shares < shares) return res.status(400).json({ error: "Not enough shares" });
+    const stockResult = await pool.query("SELECT * FROM stocks WHERE symbol = $1", [symbol]);
+    const stock = stockResult.rows[0];
+    
+    if (!stock) return res.status(400).json({ error: "Stock not found" });
+    
+    const value = stock.price * shares;
+    const holdingResult = await pool.query("SELECT * FROM portfolio WHERE user_id = $1 AND symbol = $2", [req.session.userId, symbol]);
+    const holding = holdingResult.rows[0];
+    
+    if (!holding || holding.shares < shares) {
+        return res.status(400).json({ error: "Not enough shares" });
+    }
     
     await pool.query("UPDATE users SET cash = cash + $1 WHERE id = $2", [value, req.session.userId]);
-    if (holding.rows[0].shares === shares) {
+    
+    if (holding.shares === shares) {
         await pool.query("DELETE FROM portfolio WHERE user_id = $1 AND symbol = $2", [req.session.userId, symbol]);
     } else {
         await pool.query("UPDATE portfolio SET shares = shares - $1 WHERE user_id = $2 AND symbol = $3", [shares, req.session.userId, symbol]);
     }
     
-    await pool.query("INSERT INTO transactions (user_id, symbol, type, shares, price, total) VALUES ($1, $2, $3, $4, $5, $6)", [req.session.userId, symbol, 'SELL', shares, stock.rows[0].price, value]);
-    res.json({ success: true, message: `Sold ${shares} shares of ${symbol} at $${stock.rows[0].price}` });
+    await pool.query("INSERT INTO transactions (user_id, symbol, type, shares, price, total) VALUES ($1, $2, $3, $4, $5, $6)", [req.session.userId, symbol, 'SELL', shares, stock.price, value]);
+    
+    res.json({ success: true, message: `Sold ${shares} shares of ${symbol}` });
 });
 
-// UPDATE PROFILE
+// ==================== PROFILE ROUTES ====================
 app.put('/api/user/profile', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
+    
     const { username, email } = req.body;
-    if (username) await pool.query("UPDATE users SET username = $1 WHERE id = $2", [username, req.session.userId]);
-    if (email) await pool.query("UPDATE users SET email = $1 WHERE id = $2", [email, req.session.userId]);
+    if (username) {
+        await pool.query("UPDATE users SET username = $1 WHERE id = $2", [username, req.session.userId]);
+    }
+    if (email) {
+        await pool.query("UPDATE users SET email = $1 WHERE id = $2", [email, req.session.userId]);
+    }
     res.json({ success: true });
 });
 
-// CHANGE PASSWORD
 app.put('/api/user/password', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
+    
     const { currentPassword, newPassword } = req.body;
-    const user = await pool.query("SELECT password FROM users WHERE id = $1", [req.session.userId]);
-    const valid = await bcrypt.compare(currentPassword, user.rows[0].password);
-    if (!valid) return res.status(401).json({ error: "Current password incorrect" });
+    const userResult = await pool.query("SELECT password FROM users WHERE id = $1", [req.session.userId]);
+    const valid = await bcrypt.compare(currentPassword, userResult.rows[0].password);
+    
+    if (!valid) {
+        return res.status(401).json({ error: "Current password incorrect" });
+    }
+    
     const hashed = await bcrypt.hash(newPassword, 10);
     await pool.query("UPDATE users SET password = $1 WHERE id = $2", [hashed, req.session.userId]);
     res.json({ success: true });
 });
 
-// DEPOSIT REQUEST - EMAIL
+// ==================== CASH ROUTES (Email redirect) ====================
 app.post('/api/user/add-money', (req, res) => {
     res.json({ redirect: true, email: 'kelsey@charterflow.store' });
 });
 
-// WITHDRAW REQUEST - EMAIL
 app.post('/api/user/withdraw-money', (req, res) => {
     res.json({ redirect: true, email: 'kelsey@charterflow.store' });
 });
 
-// VERIFY PASSWORD
 app.post('/api/verify-password', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
+    
     const { password } = req.body;
-    const user = await pool.query("SELECT password FROM users WHERE id = $1", [req.session.userId]);
-    const valid = await bcrypt.compare(password, user.rows[0].password);
+    const userResult = await pool.query("SELECT password FROM users WHERE id = $1", [req.session.userId]);
+    const valid = await bcrypt.compare(password, userResult.rows[0].password);
     res.json({ valid });
 });
 
-// ADMIN ROUTES
+// ==================== ADMIN ROUTES ====================
 const ADMIN_SECRET = 'ApexMaster2024';
 
 app.get('/api/admin/:secret/users', async (req, res) => {
@@ -287,26 +331,6 @@ app.post('/api/admin/:secret/user/:id/tier', async (req, res) => {
     res.json({ success: true, newCash });
 });
 
-app.post('/api/admin/:secret/user/:id/reset', async (req, res) => {
-    if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
-    const user = await pool.query("SELECT tier FROM users WHERE id = $1", [req.params.id]);
-    const tier = user.rows[0]?.tier || 1;
-    const tierCapital = {1: 1000, 2: 5000, 3: 15000};
-    const newCash = tierCapital[tier];
-    await pool.query("DELETE FROM portfolio WHERE user_id = $1", [req.params.id]);
-    await pool.query("DELETE FROM transactions WHERE user_id = $1", [req.params.id]);
-    await pool.query("UPDATE users SET cash = $1 WHERE id = $2", [newCash, req.params.id]);
-    res.json({ success: true });
-});
-
-app.delete('/api/admin/:secret/user/:id', async (req, res) => {
-    if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
-    await pool.query("DELETE FROM portfolio WHERE user_id = $1", [req.params.id]);
-    await pool.query("DELETE FROM transactions WHERE user_id = $1", [req.params.id]);
-    await pool.query("DELETE FROM users WHERE id = $1", [req.params.id]);
-    res.json({ success: true });
-});
-
 app.get('/api/admin/:secret/stocks', async (req, res) => {
     if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
     const stocks = await getStocks();
@@ -317,26 +341,31 @@ app.post('/api/admin/:secret/stock/update', async (req, res) => {
     if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
     const { symbol, name, price } = req.body;
     await pool.query("UPDATE stocks SET name = $1, price = $2 WHERE symbol = $3", [name, price, symbol]);
-    res.json({ success: true, message: "Stock updated" });
+    res.json({ success: true });
 });
 
 app.post('/api/admin/:secret/stock/add', async (req, res) => {
     if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
     const { symbol, name, price } = req.body;
     await pool.query("INSERT INTO stocks (symbol, name, price) VALUES ($1, $2, $3)", [symbol.toUpperCase(), name, price]);
-    res.json({ success: true, message: "Stock added" });
+    res.json({ success: true });
 });
 
 app.post('/api/admin/:secret/stock/delete', async (req, res) => {
     if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
     const { symbol } = req.body;
     await pool.query("DELETE FROM stocks WHERE symbol = $1", [symbol]);
-    res.json({ success: true, message: "Stock deleted" });
+    res.json({ success: true });
 });
 
 app.get('/api/admin/:secret/transactions', async (req, res) => {
     if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
-    const result = await pool.query("SELECT t.*, u.username FROM transactions t JOIN users u ON t.user_id = u.id ORDER BY date DESC LIMIT 200");
+    const result = await pool.query(`
+        SELECT t.*, u.username 
+        FROM transactions t 
+        JOIN users u ON t.user_id = u.id 
+        ORDER BY date DESC LIMIT 200
+    `);
     res.json(result.rows);
 });
 
@@ -351,6 +380,7 @@ app.get('/api/admin/:secret/stats', async (req, res) => {
     });
 });
 
+// Serve frontend
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
