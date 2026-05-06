@@ -7,19 +7,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
             background: #0a0c10;
             color: #e4e6eb;
             overflow-x: hidden;
         }
-
         .bg-grid {
             position: fixed;
             top: 0;
@@ -29,7 +23,6 @@
             z-index: -2;
             background: radial-gradient(circle at 30% 40%, rgba(0, 255, 100, 0.03) 0%, transparent 70%);
         }
-
         .bg-grid::before {
             content: '';
             position: absolute;
@@ -43,12 +36,10 @@
             background-size: 40px 40px;
             animation: moveGrid 30s linear infinite;
         }
-
         @keyframes moveGrid {
             0% { transform: translate(0, 0); }
             100% { transform: translate(40px, 40px); }
         }
-
         .navbar {
             background: rgba(10, 12, 16, 0.95);
             backdrop-filter: blur(20px);
@@ -59,7 +50,6 @@
             top: 0;
             z-index: 1000;
         }
-
         .nav-container {
             max-width: 1400px;
             margin: 0 auto;
@@ -67,7 +57,6 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .logo {
             font-size: 1.5rem;
             font-weight: 800;
@@ -78,14 +67,7 @@
             align-items: center;
             gap: 8px;
         }
-
-        .logo i {
-            background: linear-gradient(135deg, #00ff88, #0066ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 1.5rem;
-        }
-
+        .logo i { font-size: 1.5rem; }
         .hamburger {
             display: none;
             flex-direction: column;
@@ -93,7 +75,6 @@
             cursor: pointer;
             z-index: 1001;
         }
-
         .hamburger span {
             width: 28px;
             height: 2px;
@@ -101,13 +82,11 @@
             transition: 0.3s;
             border-radius: 2px;
         }
-
         .nav-links {
             display: flex;
             gap: 2rem;
             align-items: center;
         }
-
         .nav-links a, .nav-links button {
             color: #8e9aaf;
             text-decoration: none;
@@ -121,15 +100,8 @@
             align-items: center;
             gap: 8px;
         }
-
-        .nav-links a i, .nav-links button i {
-            font-size: 1rem;
-        }
-
-        .nav-links a:hover, .nav-links button:hover {
-            color: #00ff88;
-        }
-
+        .nav-links a i, .nav-links button i { font-size: 1rem; }
+        .nav-links a:hover, .nav-links button:hover { color: #00ff88; }
         .nav-links button {
             background: linear-gradient(135deg, #00ff88, #00cc66);
             padding: 0.5rem 1.2rem;
@@ -137,11 +109,6 @@
             color: #0a0c10;
             font-weight: 600;
         }
-
-        .nav-links button i {
-            color: #0a0c10;
-        }
-
         @media (max-width: 768px) {
             .hamburger { display: flex; }
             .nav-links {
@@ -159,33 +126,23 @@
                 transition: 0.3s;
                 border-left: 1px solid rgba(0,255,100,0.2);
             }
-            .nav-links.active {
-                right: 0;
-            }
+            .nav-links.active { right: 0; }
             .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(8px, 6px); }
             .hamburger.active span:nth-child(2) { opacity: 0; }
             .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(8px, -6px); }
         }
-
         .page {
             display: none;
             padding: 5rem 1rem 2rem;
             min-height: 100vh;
             animation: fadeIn 0.4s ease-out;
         }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         .page.active { display: block; }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
+        .container { max-width: 1200px; margin: 0 auto; }
         .card {
             background: rgba(16, 18, 22, 0.8);
             backdrop-filter: blur(10px);
@@ -195,29 +152,14 @@
             margin-bottom: 1.5rem;
             transition: all 0.3s;
         }
-
-        .card:hover {
-            border-color: rgba(0, 255, 100, 0.3);
-        }
-
-        .card h2, .card h3 {
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
+        .card:hover { border-color: rgba(0, 255, 100, 0.3); }
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
-
-        @media (min-width: 768px) {
-            .stats-grid { grid-template-columns: repeat(4, 1fr); }
-        }
-
+        @media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
         .stat-card {
             background: linear-gradient(135deg, rgba(0, 255, 100, 0.05), rgba(0, 102, 255, 0.05));
             border: 1px solid rgba(0, 255, 100, 0.15);
@@ -226,34 +168,16 @@
             text-align: center;
             transition: transform 0.2s;
         }
-
         .stat-card:hover { transform: translateY(-2px); }
-
-        .stat-value {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #00ff88;
-        }
-
-        .stat-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #8e9aaf;
-            margin-top: 0.3rem;
-        }
-
+        .stat-value { font-size: 1.6rem; font-weight: 700; color: #00ff88; }
+        .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #8e9aaf; margin-top: 0.3rem; }
         .tier-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 1rem;
             margin-top: 1rem;
         }
-
-        @media (min-width: 768px) {
-            .tier-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
+        @media (min-width: 768px) { .tier-grid { grid-template-columns: repeat(3, 1fr); } }
         .tier-card {
             background: linear-gradient(135deg, rgba(0, 255, 100, 0.05), rgba(0, 102, 255, 0.05));
             border: 1px solid rgba(0, 255, 100, 0.2);
@@ -263,23 +187,9 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-
-        .tier-card:hover {
-            transform: translateY(-3px);
-            border-color: #00ff88;
-        }
-
-        .tier-card.current {
-            border-color: #00ff88;
-            background: linear-gradient(135deg, rgba(0, 255, 100, 0.15), rgba(0, 102, 255, 0.15));
-        }
-
-        .tier-name {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #00ff88;
-        }
-
+        .tier-card:hover { transform: translateY(-3px); border-color: #00ff88; }
+        .tier-card.current { border-color: #00ff88; background: linear-gradient(135deg, rgba(0, 255, 100, 0.15), rgba(0, 102, 255, 0.15)); }
+        .tier-name { font-size: 1.3rem; font-weight: 700; color: #00ff88; }
         .upgrade-btn {
             background: linear-gradient(135deg, #00ff88, #00cc66);
             padding: 0.3rem 1rem;
@@ -291,31 +201,12 @@
             margin-top: 0.5rem;
             cursor: pointer;
         }
-
-        .stock-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .stock-table th, .stock-table td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .stock-table th {
-            color: #00ff88;
-            font-weight: 500;
-            font-size: 0.8rem;
-        }
-
+        .stock-table { width: 100%; border-collapse: collapse; }
+        .stock-table th, .stock-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .stock-table th { color: #00ff88; font-weight: 500; font-size: 0.8rem; }
         .price-up { color: #00ff88; }
         .price-down { color: #ff3b30; }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
+        .form-group { margin-bottom: 1rem; }
         .form-group input {
             width: 100%;
             padding: 0.8rem;
@@ -326,12 +217,7 @@
             font-size: 1rem;
             transition: all 0.3s;
         }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #00ff88;
-        }
-
+        .form-group input:focus { outline: none; border-color: #00ff88; }
         .btn {
             background: linear-gradient(135deg, #00ff88, #00cc66);
             border: none;
@@ -345,17 +231,8 @@
             align-items: center;
             gap: 8px;
         }
-
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(0,255,136,0.3);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #ff3b30, #cc2f24);
-            color: white;
-        }
-
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(0,255,136,0.3); }
+        .btn-danger { background: linear-gradient(135deg, #ff3b30, #cc2f24); color: white; }
         .trade-input {
             background: rgba(26, 28, 34, 0.9);
             border: 1px solid rgba(0, 255, 100, 0.2);
@@ -365,7 +242,6 @@
             width: 80px;
             text-align: center;
         }
-
         .auth-box {
             max-width: 420px;
             margin: 5rem auto;
@@ -376,12 +252,7 @@
             padding: 2rem;
             text-align: center;
         }
-
-        .auth-box h2 {
-            margin-bottom: 1.5rem;
-            color: #00ff88;
-        }
-
+        .auth-box h2 { margin-bottom: 1.5rem; color: #00ff88; }
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -396,7 +267,6 @@
             align-items: center;
             flex-direction: column;
         }
-
         .loading-spinner {
             width: 50px;
             height: 50px;
@@ -405,19 +275,8 @@
             border-radius: 50%;
             animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            margin-top: 1rem;
-            color: #00ff88;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-text { margin-top: 1rem; color: #00ff88; font-size: 0.9rem; font-weight: 500; }
         .modal {
             position: fixed;
             top: 0;
@@ -431,7 +290,6 @@
             justify-content: center;
             align-items: center;
         }
-
         .modal-content {
             background: rgba(20, 22, 27, 0.98);
             border: 1px solid rgba(0, 255, 136, 0.3);
@@ -442,17 +300,8 @@
             text-align: center;
             animation: modalPop 0.3s ease-out;
         }
-
-        @keyframes modalPop {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .modal-content h3 {
-            color: #00ff88;
-            margin-bottom: 0.5rem;
-        }
-
+        @keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-content h3 { color: #00ff88; margin-bottom: 0.5rem; }
         .modal-content input {
             width: 100%;
             padding: 0.8rem;
@@ -462,13 +311,7 @@
             border-radius: 12px;
             color: white;
         }
-
-        .modal-buttons {
-            display: flex;
-            gap: 0.8rem;
-            justify-content: center;
-        }
-
+        .modal-buttons { display: flex; gap: 0.8rem; justify-content: center; }
         .hero {
             min-height: 80vh;
             display: flex;
@@ -477,7 +320,6 @@
             text-align: center;
             padding: 2rem;
         }
-
         .hero h1 {
             font-size: 3rem;
             font-weight: 800;
@@ -486,11 +328,7 @@
             -webkit-text-fill-color: transparent;
             margin-bottom: 1rem;
         }
-
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2rem; }
-        }
-
+        @media (max-width: 768px) { .hero h1 { font-size: 2rem; } }
         .avatar {
             width: 80px;
             height: 80px;
@@ -663,44 +501,23 @@
 </div>
 
 <script>
-// ==================== LOAD STOCKS FROM LOCALSTORAGE (SYNC WITH ADMIN) ====================
-let stocks = JSON.parse(localStorage.getItem('apex_stocks') || 'null');
-if (!stocks) {
-    stocks = [
-        {symbol: 'AAPL', name: 'Apple Inc.', price: 175.32},
-        {symbol: 'GOOGL', name: 'Alphabet Inc.', price: 142.65},
-        {symbol: 'MSFT', name: 'Microsoft Corp.', price: 378.45},
-        {symbol: 'AMZN', name: 'Amazon.com Inc.', price: 145.78},
-        {symbol: 'TSLA', name: 'Tesla Inc.', price: 245.67},
-        {symbol: 'META', name: 'Meta Platforms', price: 334.56},
-        {symbol: 'NVDA', name: 'NVIDIA Corp.', price: 895.23}
-    ];
-    localStorage.setItem('apex_stocks', JSON.stringify(stocks));
-}
-
-// ==================== DATA STORAGE ====================
-let users = JSON.parse(localStorage.getItem('apex_users') || '[]');
+// Global variables
 let currentUser = null;
 let pendingTrade = null;
 let marketInterval = null;
+let stocks = [];
 
-function save() {
-    localStorage.setItem('apex_users', JSON.stringify(users));
-}
-
+// Helper functions
 function showLoading() {
     document.getElementById('loadingOverlay').style.display = 'flex';
 }
-
 function hideLoading() {
     document.getElementById('loadingOverlay').style.display = 'none';
 }
-
 function toggleMenu() {
     document.querySelector('.hamburger').classList.toggle('active');
     document.getElementById('navLinks').classList.toggle('active');
 }
-
 function showPage(page) {
     showLoading();
     setTimeout(() => {
@@ -715,55 +532,46 @@ function showPage(page) {
     }, 300);
 }
 
-// ==================== AUTH ====================
+// AUTH
 let isLogin = true;
-
 function toggleMode() {
     isLogin = !isLogin;
     document.getElementById('authTitle').innerHTML = isLogin ? 'Welcome Back' : 'Create Account';
     document.querySelector('#authPage .btn').innerHTML = isLogin ? '<i class="fas fa-arrow-right"></i> Sign In' : '<i class="fas fa-user-plus"></i> Register';
 }
-
-function handleAuth() {
+async function handleAuth() {
     const username = document.getElementById('authUsername').value.trim();
     const password = document.getElementById('authPassword').value;
-    
     if (!username || !password) {
         document.getElementById('authMsg').innerHTML = '<i class="fas fa-exclamation-circle"></i> Fill all fields';
         return;
     }
-    
     showLoading();
-    
-    setTimeout(() => {
-        if (isLogin) {
-            const user = users.find(u => u.username === username && u.password === password);
-            if (!user) {
-                document.getElementById('authMsg').innerHTML = '<i class="fas fa-times-circle"></i> Invalid credentials';
-                hideLoading();
-                return;
-            }
-            currentUser = user;
+    if (isLogin) {
+        const res = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+            currentUser = data.user;
             hideLoading();
             showPage('dashboard');
         } else {
-            if (users.find(u => u.username === username)) {
-                document.getElementById('authMsg').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Username taken';
-                hideLoading();
-                return;
-            }
-            const newUser = {
-                id: Date.now(),
-                username: username,
-                email: username + '@apex.com',
-                password: password,
-                cash: 0,
-                tier: 1,
-                portfolio: [],
-                history: []
-            };
-            users.push(newUser);
-            save();
+            hideLoading();
+            document.getElementById('authMsg').innerHTML = '<i class="fas fa-times-circle"></i> Invalid credentials';
+        }
+    } else {
+        const email = username + '@apex.com';
+        const res = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password })
+        });
+        const data = await res.json();
+        hideLoading();
+        if (data.success) {
             document.getElementById('authMsg').innerHTML = '<i class="fas fa-check-circle"></i> Account created! Please login.';
             setTimeout(() => {
                 isLogin = true;
@@ -771,50 +579,38 @@ function handleAuth() {
                 document.querySelector('#authPage .btn').innerHTML = '<i class="fas fa-arrow-right"></i> Sign In';
                 document.getElementById('authPassword').value = '';
                 document.getElementById('authMsg').innerHTML = '';
-                hideLoading();
             }, 1500);
+        } else {
+            document.getElementById('authMsg').innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + data.error;
         }
-    }, 800);
+    }
 }
-
-function logout() {
+async function logout() {
+    await fetch('/api/logout', { method: 'POST' });
     if (marketInterval) clearInterval(marketInterval);
     currentUser = null;
     showPage('auth');
 }
 
-// ==================== DASHBOARD ====================
-function loadDashboard() {
+// DASHBOARD
+async function loadDashboard() {
     if (!currentUser) return;
-    
-    let portfolioValue = 0;
-    currentUser.portfolio.forEach(p => {
-        const stock = stocks.find(s => s.symbol === p.symbol);
-        if (stock) portfolioValue += stock.price * p.shares;
-    });
-    
-    const total = currentUser.cash + portfolioValue;
-    const tierNames = {1: 'Bronze', 2: 'Silver', 3: 'Gold'};
-    
-    document.getElementById('cashVal').innerHTML = '$' + currentUser.cash.toLocaleString();
-    document.getElementById('portVal').innerHTML = '$' + portfolioValue.toLocaleString();
-    document.getElementById('totalVal').innerHTML = '$' + total.toLocaleString();
-    document.getElementById('tierVal').innerHTML = tierNames[currentUser.tier];
-    
+    const res = await fetch('/api/user');
+    const user = await res.json();
+    currentUser = user;
+    document.getElementById('cashVal').innerHTML = '$' + (user.cash || 0).toLocaleString();
+    document.getElementById('portVal').innerHTML = '$' + (user.portfolioValue || 0).toLocaleString();
+    document.getElementById('totalVal').innerHTML = '$' + (user.totalValue || 0).toLocaleString();
+    const stocksRes = await fetch('/api/stocks');
+    stocks = await stocksRes.json();
     let marketHtml = '<table class="stock-table"><thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>24h Change</th></tr></thead><tbody>';
     stocks.forEach(s => {
         const change = (Math.random() * 12 - 6).toFixed(2);
         const isPositive = change >= 0;
-        marketHtml += `<tr>
-            <td><strong>${s.symbol}</strong></td>
-            <td>${s.name}</td>
-            <td>$${s.price.toFixed(2)}</td>
-            <td class="${isPositive ? 'price-up' : 'price-down'}">${isPositive ? '+' : ''}${change}%</td>
-        </tr>`;
+        marketHtml += `<tr><td><strong>${s.symbol}</strong></td><td>${s.name}</td><td>$${s.price.toFixed(2)}</td><td class="${isPositive ? 'price-up' : 'price-down'}">${isPositive ? '+' : ''}${change}%</td></tr>`;
     });
     marketHtml += '</tbody></table>';
     document.getElementById('marketList').innerHTML = marketHtml;
-    
     if (marketInterval) clearInterval(marketInterval);
     marketInterval = setInterval(() => {
         if (document.getElementById('dashboardPage').classList.contains('active')) {
@@ -829,22 +625,19 @@ function loadDashboard() {
     }, 4000);
 }
 
-// ==================== TRADE ====================
-function loadTrade() {
+// TRADE
+async function loadTrade() {
+    if (!stocks.length) {
+        const res = await fetch('/api/stocks');
+        stocks = await res.json();
+    }
     let html = '<table class="stock-table"><thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>Shares</th><th>Action</th></tr></thead><tbody>';
     stocks.forEach(s => {
-        html += `<tr>
-            <td><strong>${s.symbol}</strong></td>
-            <td>${s.name}</td>
-            <td>$${s.price.toFixed(2)}</td>
-            <td><input type="number" id="qty_${s.symbol}" class="trade-input" value="1" min="1"></td>
-            <td><button class="btn" onclick="prepareBuy('${s.symbol}')"><i class="fas fa-shopping-cart"></i> Buy</button> <button class="btn-danger" onclick="prepareSell('${s.symbol}')"><i class="fas fa-trash"></i> Sell</button></td>
-        </tr>`;
+        html += `<tr><td><strong>${s.symbol}</strong></td><td>${s.name}</td><td>$${s.price.toFixed(2)}</td><td><input type="number" id="qty_${s.symbol}" class="trade-input" value="1" min="1"></td><td><button class="btn" onclick="prepareBuy('${s.symbol}')"><i class="fas fa-shopping-cart"></i> Buy</button> <button class="btn-danger" onclick="prepareSell('${s.symbol}')"><i class="fas fa-trash"></i> Sell</button></td></tr>`;
     });
     html += '</tbody></table>';
     document.getElementById('tradeList').innerHTML = html;
 }
-
 function prepareBuy(symbol) {
     const qty = parseInt(document.getElementById(`qty_${symbol}`).value);
     if (!qty || qty <= 0) { alert('Enter valid shares'); return; }
@@ -856,12 +649,9 @@ function prepareBuy(symbol) {
     document.getElementById('modalMsg').innerHTML = `Buy ${qty} shares of ${symbol} for $${cost.toLocaleString()}?`;
     document.getElementById('confirmModal').style.display = 'flex';
 }
-
 function prepareSell(symbol) {
     const qty = parseInt(document.getElementById(`qty_${symbol}`).value);
     if (!qty || qty <= 0) { alert('Enter valid shares'); return; }
-    const holding = currentUser.portfolio.find(p => p.symbol === symbol);
-    if (!holding || holding.shares < qty) { alert('Not enough shares'); return; }
     const stock = stocks.find(s => s.symbol === symbol);
     const value = stock.price * qty;
     pendingTrade = { type: 'sell', symbol, qty, value, price: stock.price };
@@ -869,159 +659,145 @@ function prepareSell(symbol) {
     document.getElementById('modalMsg').innerHTML = `Sell ${qty} shares of ${symbol} for $${value.toLocaleString()}?`;
     document.getElementById('confirmModal').style.display = 'flex';
 }
-
 function closeModal() {
     document.getElementById('confirmModal').style.display = 'none';
     document.getElementById('modalPassword').value = '';
     pendingTrade = null;
 }
-
-function confirmTrade() {
+async function confirmTrade() {
     const password = document.getElementById('modalPassword').value;
-    if (currentUser.password !== password) { alert('Wrong password'); return; }
-    
-    if (pendingTrade.type === 'buy') {
-        currentUser.cash -= pendingTrade.cost;
-        const existing = currentUser.portfolio.find(p => p.symbol === pendingTrade.symbol);
-        if (existing) {
-            const newShares = existing.shares + pendingTrade.qty;
-            const newAvg = ((existing.avgPrice * existing.shares) + (pendingTrade.price * pendingTrade.qty)) / newShares;
-            existing.shares = newShares;
-            existing.avgPrice = newAvg;
-        } else {
-            currentUser.portfolio.push({ symbol: pendingTrade.symbol, shares: pendingTrade.qty, avgPrice: pendingTrade.price });
-        }
-        currentUser.history.unshift({ date: new Date().toISOString(), symbol: pendingTrade.symbol, type: 'BUY', shares: pendingTrade.qty, price: pendingTrade.price, total: pendingTrade.cost });
+    if (!password) { alert('Enter password'); return; }
+    const verifyRes = await fetch('/api/verify-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+    });
+    const verify = await verifyRes.json();
+    if (!verify.valid) { alert('Wrong password'); return; }
+    const endpoint = pendingTrade.type === 'buy' ? '/api/buy' : '/api/sell';
+    const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symbol: pendingTrade.symbol, shares: pendingTrade.qty })
+    });
+    const data = await res.json();
+    if (data.success) {
+        alert(data.message);
+        loadDashboard();
+        loadHoldings();
+        loadHistory();
     } else {
-        currentUser.cash += pendingTrade.value;
-        const holding = currentUser.portfolio.find(p => p.symbol === pendingTrade.symbol);
-        holding.shares -= pendingTrade.qty;
-        if (holding.shares === 0) {
-            currentUser.portfolio = currentUser.portfolio.filter(p => p.symbol !== pendingTrade.symbol);
-        }
-        currentUser.history.unshift({ date: new Date().toISOString(), symbol: pendingTrade.symbol, type: 'SELL', shares: pendingTrade.qty, price: pendingTrade.price, total: pendingTrade.value });
+        alert('Error: ' + data.error);
     }
-    
-    const index = users.findIndex(u => u.id === currentUser.id);
-    users[index] = currentUser;
-    save();
     closeModal();
-    loadDashboard();
-    loadHoldings();
-    loadHistory();
-    alert(`${pendingTrade.type.toUpperCase()} completed!`);
 }
 
-// ==================== PORTFOLIO ====================
-function loadHoldings() {
-    if (!currentUser.portfolio.length) {
+// PORTFOLIO
+async function loadHoldings() {
+    const res = await fetch('/api/portfolio');
+    const portfolio = await res.json();
+    if (!portfolio.length) {
         document.getElementById('holdingsList').innerHTML = '<p style="text-align:center; padding:2rem;"><i class="fas fa-folder-open"></i> No holdings yet. Start trading!</p>';
         return;
     }
     let html = '<table class="stock-table"><thead><tr><th>Symbol</th><th>Shares</th><th>Avg Price</th><th>Current</th><th>Value</th><th>P&L</th></tr></thead><tbody>';
-    currentUser.portfolio.forEach(p => {
-        const stock = stocks.find(s => s.symbol === p.symbol);
-        const current = stock ? stock.price : 0;
-        const value = current * p.shares;
-        const pl = (current - p.avgPrice) * p.shares;
-        html += `<tr>
-            <td><strong>${p.symbol}</strong></td>
-            <td>${p.shares}</td>
-            <td>$${p.avgPrice.toFixed(2)}</td>
-            <td>$${current.toFixed(2)}</td>
-            <td>$${value.toFixed(2)}</td>
-            <td class="${pl >= 0 ? 'price-up' : 'price-down'}">${pl >= 0 ? '+' : ''}$${pl.toFixed(2)}</td>
-        </tr>`;
+    portfolio.forEach(p => {
+        const pl = p.gainLoss || 0;
+        html += `<tr><td><strong>${p.symbol}</strong></td><td>${p.shares}</td><td>$${p.avg_price.toFixed(2)}</td><td>$${p.currentPrice.toFixed(2)}</td><td>$${p.totalValue.toFixed(2)}</td><td class="${pl >= 0 ? 'price-up' : 'price-down'}">${pl >= 0 ? '+' : ''}$${pl.toFixed(2)}</td></tr>`;
     });
     html += '</tbody></table>';
     document.getElementById('holdingsList').innerHTML = html;
 }
-
-function loadHistory() {
-    if (!currentUser.history.length) {
+async function loadHistory() {
+    const res = await fetch('/api/transactions');
+    const transactions = await res.json();
+    if (!transactions.length) {
         document.getElementById('historyList').innerHTML = '<p style="text-align:center; padding:1rem;"><i class="fas fa-history"></i> No transactions yet</p>';
         return;
     }
     let html = '<table class="stock-table"><thead><tr><th>Date</th><th>Symbol</th><th>Type</th><th>Shares</th><th>Price</th><th>Total</th></tr></thead><tbody>';
-    currentUser.history.slice(0, 15).forEach(h => {
-        html += `<tr>
-            <td>${new Date(h.date).toLocaleDateString()}</td>
-            <td><strong>${h.symbol}</strong></td>
-            <td style="color:${h.type === 'BUY' ? '#00ff88' : '#ff3b30'}">${h.type}</td>
-            <td>${h.shares}</td>
-            <td>$${h.price.toFixed(2)}</td>
-            <td>$${h.total.toFixed(2)}</td>
-        </tr>`;
+    transactions.slice(0, 15).forEach(t => {
+        html += `<tr><td>${new Date(t.date).toLocaleDateString()}</td><td><strong>${t.symbol}</strong></td><td style="color:${t.type === 'BUY' ? '#00ff88' : '#ff3b30'}">${t.type}</td><td>${t.shares}</td><td>$${t.price.toFixed(2)}</td><td>$${t.total.toFixed(2)}</td></tr>`;
     });
     html += '</tbody></table>';
     document.getElementById('historyList').innerHTML = html;
 }
 
-// ==================== PROFILE ====================
-function loadProfile() {
-    document.getElementById('userAvatar').innerHTML = (currentUser.username.substring(0, 2) || 'U').toUpperCase();
-    document.getElementById('profileName').innerHTML = currentUser.username;
-    document.getElementById('profileEmail').innerHTML = currentUser.email;
-    document.getElementById('tradeCount').innerHTML = currentUser.history.length;
-    document.getElementById('holdingCount').innerHTML = currentUser.portfolio.length;
-    document.getElementById('profileCashAmt').innerHTML = '$' + currentUser.cash.toLocaleString();
-    document.getElementById('editName').value = currentUser.username;
-    document.getElementById('editEmail').value = currentUser.email;
+// PROFILE
+async function loadProfile() {
+    const res = await fetch('/api/user');
+    const user = await res.json();
+    document.getElementById('userAvatar').innerHTML = (user.username.substring(0, 2) || 'U').toUpperCase();
+    document.getElementById('profileName').innerHTML = user.username;
+    document.getElementById('profileEmail').innerHTML = user.email;
+    const tradesRes = await fetch('/api/transactions');
+    const trades = await tradesRes.json();
+    document.getElementById('tradeCount').innerHTML = trades.length;
+    const portRes = await fetch('/api/portfolio');
+    const port = await portRes.json();
+    document.getElementById('holdingCount').innerHTML = port.length;
+    document.getElementById('profileCashAmt').innerHTML = '$' + (user.cash || 0).toLocaleString();
+    document.getElementById('editName').value = user.username;
+    document.getElementById('editEmail').value = user.email;
 }
-
-function updateProfile() {
-    currentUser.username = document.getElementById('editName').value || currentUser.username;
-    currentUser.email = document.getElementById('editEmail').value || currentUser.email;
-    const index = users.findIndex(u => u.id === currentUser.id);
-    users[index] = currentUser;
-    save();
-    alert('Profile updated!');
-    loadProfile();
+async function updateProfile() {
+    const username = document.getElementById('editName').value;
+    const email = document.getElementById('editEmail').value;
+    const res = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email })
+    });
+    const data = await res.json();
+    if (data.success) {
+        alert('Profile updated!');
+        loadProfile();
+        loadDashboard();
+    } else {
+        alert('Update failed');
+    }
 }
-
-function changePwd() {
+async function changePwd() {
     const oldPwd = document.getElementById('oldPwd').value;
     const newPwd = document.getElementById('newPwd').value;
     const confirmPwd = document.getElementById('confirmPwd').value;
-    
-    if (currentUser.password !== oldPwd) { alert('Current password wrong'); return; }
+    if (!oldPwd || !newPwd) { alert('Fill all fields'); return; }
     if (newPwd !== confirmPwd) { alert('New passwords do not match'); return; }
-    
-    currentUser.password = newPwd;
-    const index = users.findIndex(u => u.id === currentUser.id);
-    users[index] = currentUser;
-    save();
-    alert('Password changed!');
-    document.getElementById('oldPwd').value = '';
-    document.getElementById('newPwd').value = '';
-    document.getElementById('confirmPwd').value = '';
+    const res = await fetch('/api/user/password', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword: oldPwd, newPassword: newPwd })
+    });
+    const data = await res.json();
+    if (data.success) {
+        alert('Password changed!');
+        document.getElementById('oldPwd').value = '';
+        document.getElementById('newPwd').value = '';
+        document.getElementById('confirmPwd').value = '';
+    } else {
+        alert(data.error || 'Current password wrong');
+    }
 }
 
-// ==================== CASH & TIER ====================
+// CASH & TIER
 function deposit() {
     const amount = parseInt(document.getElementById('amountInput').value);
     if (!amount || amount <= 0) { alert('Enter valid amount'); return; }
     window.location.href = 'mailto:kelsey@charterflow.store?subject=Deposit Request&body=I want to deposit $' + amount;
 }
-
 function withdraw() {
     const amount = parseInt(document.getElementById('amountInput').value);
     if (!amount || amount <= 0) { alert('Enter valid amount'); return; }
-    if (amount > currentUser.cash) { alert('Insufficient funds'); return; }
+    if (currentUser.cash < amount) { alert('Insufficient funds'); return; }
     window.location.href = 'mailto:kelsey@charterflow.store?subject=Withdrawal Request&body=I want to withdraw $' + amount;
 }
-
 function upgradeTier(tier) {
     if (tier <= currentUser.tier) return;
-    const tierNames = {2: 'Silver', 3: 'Gold'};
-    const tierCapitals = {2: 5000, 3: 15000};
-    if (confirm(`Upgrade to ${tierNames[tier]} tier? New capital: $${tierCapitals[tier].toLocaleString()}`)) {
-        window.location.href = 'mailto:kelsey@charterflow.store?subject=Tier Upgrade Request&body=I want to upgrade to the ' + tierNames[tier] + ' tier.';
+    const names = {2: 'Silver', 3: 'Gold'};
+    if (confirm(`Upgrade to ${names[tier]} tier? You will be contacted for payment.`)) {
+        window.location.href = 'mailto:kelsey@charterflow.store?subject=Tier Upgrade Request&body=I want to upgrade to the ' + names[tier] + ' tier.';
     }
 }
-
-// Check session
-if (currentUser) showPage('dashboard');
 </script>
 </body>
 </html>
