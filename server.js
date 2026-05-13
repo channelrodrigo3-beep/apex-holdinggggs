@@ -304,8 +304,10 @@ app.get('/api/admin/:secret/users', async (req, res) => {
     if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
     try {
         const result = await pool.query("SELECT id, username, email, cash, tier, created_at FROM users");
+        console.log("Users found:", result.rows.length);
         res.json(result.rows);
     } catch (err) {
+        console.error("Error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
