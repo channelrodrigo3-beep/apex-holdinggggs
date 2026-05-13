@@ -3,432 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Holdings - Admin Control</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>Apex Holdings - Admin</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: system-ui, -apple-system, 'Inter', sans-serif;
+            font-family: Arial, sans-serif;
             background: #0a0c10;
-            color: #e4e6eb;
-            padding: 1rem;
+            color: white;
+            padding: 20px;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; }
         .header {
-            background: linear-gradient(135deg, #ff3b30, #cc2f24);
-            padding: 1.5rem;
-            border-radius: 20px;
-            margin-bottom: 1.5rem;
+            background: #ff3b30;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
         }
-        .header h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
         .stats {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
         }
-        .stat-box {
-            background: rgba(0,255,100,0.1);
-            padding: 1rem;
-            border-radius: 12px;
+        .stat-card {
+            background: #1a1c22;
+            padding: 15px;
+            border-radius: 10px;
             text-align: center;
         }
-        .stat-number { font-size: 1.5rem; font-weight: bold; color: #00ff88; }
-        .tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 0.5rem;
-        }
-        .tab {
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: #8e9aaf;
-            font-size: 0.9rem;
-        }
-        .tab.active { color: #00ff88; border-bottom: 2px solid #00ff88; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .card {
-            background: rgba(20, 22, 27, 0.95);
-            border: 1px solid rgba(0, 255, 100, 0.2);
-            border-radius: 16px;
-            padding: 1.2rem;
-            margin-bottom: 1rem;
-        }
-        .card h2 { color: #00ff88; font-size: 1.2rem; margin-bottom: 1rem; }
-        .card h3 { color: #00ff88; font-size: 1rem; margin-bottom: 0.8rem; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; margin-bottom: 0.3rem; color: #8e9aaf; font-size: 0.8rem; }
-        input, select {
+        .stat-number { font-size: 28px; font-weight: bold; color: #00ff88; }
+        table {
             width: 100%;
-            padding: 0.6rem;
+            border-collapse: collapse;
             background: #1a1c22;
-            border: 1px solid rgba(0,255,100,0.2);
-            border-radius: 8px;
-            color: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+        th { background: #00ff88; color: black; }
+        input, select {
+            padding: 8px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
         }
         button {
-            background: linear-gradient(135deg, #00ff88, #00cc66);
-            padding: 0.6rem 1rem;
+            background: #00ff88;
+            color: black;
+            padding: 8px 15px;
             border: none;
-            border-radius: 8px;
-            font-weight: 600;
+            border-radius: 5px;
             cursor: pointer;
-            margin-right: 0.5rem;
+            font-weight: bold;
         }
-        .btn-danger { background: linear-gradient(135deg, #ff3b30, #cc2f24); color: white; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        th, td { padding: 0.5rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        th { color: #00ff88; }
-        .alert {
-            padding: 0.8rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            display: none;
+        .error { color: #ff3b30; text-align: center; padding: 20px; }
+        .success { color: #00ff88; text-align: center; padding: 10px; display: none; }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
         }
-        .alert.success { background: rgba(0,255,100,0.1); border: 1px solid #00ff88; color: #00ff88; display: block; }
-        .alert.error { background: rgba(255,59,48,0.1); border: 1px solid #ff3b30; color: #ff3b30; display: block; }
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: #00ff88;
+        .tab {
+            padding: 10px 20px;
+            background: #1a1c22;
+            cursor: pointer;
+            border-radius: 5px;
         }
-        @media (max-width: 768px) {
-            .stats { grid-template-columns: repeat(2, 1fr); }
-            .tabs { justify-content: center; }
-        }
+        .tab.active { background: #00ff88; color: black; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1><i class="fas fa-shield-alt"></i> APEX HOLDINGS ADMIN</h1>
-        <p>Full control: Users, Stocks, Transactions - Database Mode</p>
+        <h1>🔒 APEX ADMIN PANEL</h1>
+        <p>Password: ApexMaster2024</p>
     </div>
 
-    <div class="stats" id="stats">
-        <div class="stat-box"><div class="stat-number" id="totalUsers">-</div><div class="stat-label">Users</div></div>
-        <div class="stat-box"><div class="stat-number" id="totalCash">-</div><div class="stat-label">Total Cash</div></div>
-        <div class="stat-box"><div class="stat-number" id="totalTrades">-</div><div class="stat-label">Trades</div></div>
+    <div class="stats">
+        <div class="stat-card"><div class="stat-number" id="totalUsers">0</div><div>Total Users</div></div>
+        <div class="stat-card"><div class="stat-number" id="totalCash">$0</div><div>Total Cash</div></div>
+        <div class="stat-card"><div class="stat-number" id="totalTrades">0</div><div>Total Trades</div></div>
     </div>
 
     <div class="tabs">
-        <button class="tab active" onclick="showTab('users')"><i class="fas fa-users"></i> Users</button>
-        <button class="tab" onclick="showTab('stocks')"><i class="fas fa-chart-line"></i> Stocks</button>
-        <button class="tab" onclick="showTab('transactions')"><i class="fas fa-history"></i> Transactions</button>
+        <div class="tab active" onclick="showTab('users')">Users</div>
+        <div class="tab" onclick="showTab('stocks')">Stocks</div>
     </div>
 
-    <!-- Users Tab -->
     <div id="usersTab" class="tab-content active">
-        <div class="card">
-            <h2><i class="fas fa-user-edit"></i> Manage Users</h2>
-            <div id="userAlert" class="alert"></div>
-            <div class="grid">
-                <div>
-                    <h3><i class="fas fa-dollar-sign"></i> Add Cash</h3>
-                    <div class="form-group"><label>Select User</label><select id="cashUserId"></select></div>
-                    <div class="form-group"><label>Amount ($)</label><input type="number" id="cashAmount"></div>
-                    <button onclick="addCash()"><i class="fas fa-plus-circle"></i> Add Cash</button>
-                </div>
-                <div>
-                    <h3><i class="fas fa-crown"></i> Change Tier</h3>
-                    <div class="form-group"><label>Select User</label><select id="tierUserId"></select></div>
-                    <div class="form-group"><label>New Tier</label>
-                        <select id="newTier">
-                            <option value="1">🥉 Bronze - $1,000</option>
-                            <option value="2">🥈 Silver - $5,000</option>
-                            <option value="3">🥇 Gold - $15,000</option>
-                        </select>
-                    </div>
-                    <button onclick="changeTier()"><i class="fas fa-exchange-alt"></i> Update Tier</button>
-                </div>
-                <div>
-                    <h3><i class="fas fa-trash"></i> Reset / Delete</h3>
-                    <div class="form-group"><label>Select User</label><select id="resetUserId"></select></div>
-                    <button onclick="resetUser()" class="btn-danger"><i class="fas fa-undo"></i> Reset Account</button>
-                    <button onclick="deleteUser()" class="btn-danger"><i class="fas fa-trash"></i> Delete User</button>
-                </div>
-            </div>
-            <div id="usersList"><div class="loading"><i class="fas fa-spinner fa-pulse"></i> Loading users...</div></div>
-        </div>
+        <div id="usersList">Loading...</div>
     </div>
 
-    <!-- Stocks Tab -->
     <div id="stocksTab" class="tab-content">
-        <div class="card">
-            <h2><i class="fas fa-chart-line"></i> Manage Stocks</h2>
-            <div id="stockAlert" class="alert"></div>
-            <div class="grid">
-                <div>
-                    <h3><i class="fas fa-edit"></i> Edit Stock Price</h3>
-                    <div class="form-group"><label>Select Stock</label><select id="editStockSymbol"></select></div>
-                    <div class="form-group"><label>New Price ($)</label><input type="number" id="editPrice" step="0.01"></div>
-                    <button onclick="updateStockPrice()"><i class="fas fa-save"></i> Update Price</button>
-                </div>
-                <div>
-                    <h3><i class="fas fa-plus-circle"></i> Add New Stock</h3>
-                    <div class="form-group"><label>Symbol</label><input type="text" id="newSymbol" placeholder="e.g., NFLX"></div>
-                    <div class="form-group"><label>Company Name</label><input type="text" id="newName"></div>
-                    <div class="form-group"><label>Price ($)</label><input type="number" id="newPrice" step="0.01"></div>
-                    <button onclick="addStock()"><i class="fas fa-plus"></i> Add Stock</button>
-                </div>
-            </div>
-            <div id="stocksList"><div class="loading"><i class="fas fa-spinner fa-pulse"></i> Loading stocks...</div></div>
-        </div>
-    </div>
-
-    <!-- Transactions Tab -->
-    <div id="transactionsTab" class="tab-content">
-        <div class="card">
-            <h2><i class="fas fa-history"></i> All Transactions</h2>
-            <div id="transactionsList"><div class="loading"><i class="fas fa-spinner fa-pulse"></i> Loading transactions...</div></div>
-        </div>
+        <div id="stocksList">Loading...</div>
     </div>
 </div>
 
 <script>
 const ADMIN_SECRET = 'ApexMaster2024';
-let stocksList = [];
 
-// Helper function to make admin API calls
-async function adminFetch(endpoint, options = {}) {
-    const res = await fetch(`/api/admin/${ADMIN_SECRET}/${endpoint}`, options);
-    return res.json();
+async function fetchAPI(endpoint) {
+    try {
+        const res = await fetch(`/api/admin/${ADMIN_SECRET}/${endpoint}`);
+        return await res.json();
+    } catch(e) {
+        console.error(e);
+        return null;
+    }
 }
 
-// Load statistics
 async function loadStats() {
-    try {
-        const stats = await adminFetch('stats');
+    const stats = await fetchAPI('stats');
+    if(stats) {
         document.getElementById('totalUsers').innerText = stats.totalUsers || 0;
         document.getElementById('totalCash').innerText = '$' + (stats.totalCash || 0).toLocaleString();
         document.getElementById('totalTrades').innerText = stats.totalTrades || 0;
-    } catch(e) { console.error(e); }
+    }
 }
 
-// Load users from database
 async function loadUsers() {
-    try {
-        const users = await adminFetch('users');
-        
-        const cashSelect = document.getElementById('cashUserId');
-        const tierSelect = document.getElementById('tierUserId');
-        const resetSelect = document.getElementById('resetUserId');
-        
-        cashSelect.innerHTML = '<option value="">Select user...</option>';
-        tierSelect.innerHTML = '<option value="">Select user...</option>';
-        resetSelect.innerHTML = '<option value="">Select user...</option>';
-        
+    const users = await fetchAPI('users');
+    if(users && users.length > 0) {
+        let html = '</td><thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Cash</th><th>Tier</th><th>Action</th></tr></thead><tbody>';
         users.forEach(u => {
-            const tierName = u.tier == 1 ? 'Bronze' : u.tier == 2 ? 'Silver' : 'Gold';
-            cashSelect.innerHTML += `<option value="${u.id}">${u.username} - $${(u.cash || 0).toLocaleString()} (${tierName})</option>`;
-            tierSelect.innerHTML += `<option value="${u.id}">${u.username} - ${tierName}</option>`;
-            resetSelect.innerHTML += `<option value="${u.id}">${u.username} - ${tierName}</option>`;
-        });
-        
-        let html = '<table><thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Cash</th><th>Tier</th><th>Joined</th></tr></thead><tbody>';
-        users.forEach(u => {
-            const tierName = u.tier == 1 ? '🥉 Bronze' : u.tier == 2 ? '🥈 Silver' : '🥇 Gold';
             html += `<tr>
                 <td>${u.id}</td>
-                <td><strong>${u.username}</strong></td>
+                <td>${u.username}</td>
                 <td>${u.email}</td>
-                <td style="color:#00ff88">$${(u.cash || 0).toLocaleString()}</td>
-                <td>${tierName}</td>
-                <td>${new Date(u.created_at).toLocaleDateString()}</td>
+                <td>$${u.cash}</td>
+                <td>${u.tier == 1 ? 'Bronze' : u.tier == 2 ? 'Silver' : 'Gold'}</td>
+                <td><button onclick="addCash(${u.id})">+$1000</button></td>
             </tr>`;
         });
-        html += '</tbody></table>';
+        html += '</tbody><table>';
         document.getElementById('usersList').innerHTML = html;
-    } catch(e) {
-        document.getElementById('usersList').innerHTML = '<p style="color:#ff3b30">Error loading users</p>';
+    } else {
+        document.getElementById('usersList').innerHTML = '<div class="error">No users found. Create an account first.</div>';
     }
-}
-
-// Add cash to user
-async function addCash() {
-    const userId = document.getElementById('cashUserId').value;
-    const amount = parseFloat(document.getElementById('cashAmount').value);
-    if (!userId || !amount) { alert('Select user and enter amount'); return; }
-    
-    const res = await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}/cash`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount })
-    });
-    const data = await res.json();
-    if (data.success) {
-        showAlert('userAlert', `Added $${amount} to user`, 'success');
-        loadUsers();
-        loadStats();
-        document.getElementById('cashAmount').value = '';
-    }
-}
-
-// Change user tier
-async function changeTier() {
-    const userId = document.getElementById('tierUserId').value;
-    const tier = parseInt(document.getElementById('newTier').value);
-    if (!userId) { alert('Select user'); return; }
-    
-    const res = await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}/tier`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier })
-    });
-    const data = await res.json();
-    if (data.success) {
-        showAlert('userAlert', `Tier changed! New cash: $${data.newCash.toLocaleString()}`, 'success');
-        loadUsers();
-        loadStats();
-    }
-}
-
-// Reset user
-async function resetUser() {
-    const userId = document.getElementById('resetUserId').value;
-    if (!userId || !confirm('Reset this user to tier capital?')) return;
-    
-    await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}/reset`, { method: 'POST' });
-    showAlert('userAlert', 'User reset', 'success');
-    loadUsers();
     loadStats();
 }
 
-// Delete user
-async function deleteUser() {
-    const userId = document.getElementById('resetUserId').value;
-    if (!userId || !confirm('PERMANENTLY DELETE this user?')) return;
-    
-    await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}`, { method: 'DELETE' });
-    showAlert('userAlert', 'User deleted', 'success');
+async function addCash(userId) {
+    await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}/cash`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: 1000 })
+    });
+    alert('Added $1000');
     loadUsers();
-    loadStats();
 }
 
-// Load stocks from database
 async function loadStocks() {
-    try {
-        const stocks = await adminFetch('stocks');
-        stocksList = stocks;
-        
-        const select = document.getElementById('editStockSymbol');
-        select.innerHTML = '<option value="">Select stock...</option>';
+    const stocks = await fetchAPI('stocks');
+    if(stocks) {
+        let html = '<table><thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>Action</th></tr></thead><tbody>';
         stocks.forEach(s => {
-            select.innerHTML += `<option value="${s.symbol}">${s.symbol} - ${s.name} ($${s.price})</option>`;
-        });
-        
-        let html = '<table><thead><tr><th>Symbol</th><th>Name</th><th>Price</th></tr></thead><tbody>';
-        stocks.forEach(s => {
-            html += `<tr><td><strong>${s.symbol}</strong></td><td>${s.name}</td><td style="color:#00ff88">$${s.price.toFixed(2)}</td></tr>`;
+            html += `<tr>
+                <td>${s.symbol}</td>
+                <td>${s.name}</td>
+                <td><input type="number" id="price_${s.symbol}" value="${s.price}" step="0.01" style="width:100px"></td>
+                <td><button onclick="updateStock('${s.symbol}')">Update</button></td>
+            </tr>`;
         });
         html += '</tbody></table>';
         document.getElementById('stocksList').innerHTML = html;
-    } catch(e) {
-        document.getElementById('stocksList').innerHTML = '<p style="color:#ff3b30">Error loading stocks</p>';
+    } else {
+        document.getElementById('stocksList').innerHTML = '<div class="error">Error loading stocks</div>';
     }
 }
 
-// Update stock price
-async function updateStockPrice() {
-    const symbol = document.getElementById('editStockSymbol').value;
-    const price = parseFloat(document.getElementById('editPrice').value);
-    if (!symbol || !price) { alert('Select stock and enter price'); return; }
-    
-    const stock = stocksList.find(s => s.symbol === symbol);
-    const name = stock.name;
-    
-    const res = await fetch(`/api/admin/${ADMIN_SECRET}/stock/update`, {
+async function updateStock(symbol) {
+    const price = document.getElementById(`price_${symbol}`).value;
+    const stock = { symbol, name: symbol, price: parseFloat(price) };
+    await fetch(`/api/admin/${ADMIN_SECRET}/stock/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ symbol, name, price })
+        body: JSON.stringify(stock)
     });
-    const data = await res.json();
-    if (data.success) {
-        showAlert('stockAlert', `Price updated to $${price}`, 'success');
-        loadStocks();
-        document.getElementById('editPrice').value = '';
-    }
-}
-
-// Add new stock
-async function addStock() {
-    const symbol = document.getElementById('newSymbol').value.toUpperCase();
-    const name = document.getElementById('newName').value;
-    const price = parseFloat(document.getElementById('newPrice').value);
-    if (!symbol || !name || !price) { alert('Fill all fields'); return; }
-    
-    const res = await fetch(`/api/admin/${ADMIN_SECRET}/stock/add`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ symbol, name, price })
-    });
-    const data = await res.json();
-    if (data.success) {
-        showAlert('stockAlert', `Stock ${symbol} added!`, 'success');
-        document.getElementById('newSymbol').value = '';
-        document.getElementById('newName').value = '';
-        document.getElementById('newPrice').value = '';
-        loadStocks();
-    }
-}
-
-// Load transactions
-async function loadTransactions() {
-    try {
-        const transactions = await adminFetch('transactions');
-        if (!transactions.length) {
-            document.getElementById('transactionsList').innerHTML = '<p>No transactions yet</p>';
-            return;
-        }
-        
-        let html = '<table><thead><tr><th>Date</th><th>User</th><th>Symbol</th><th>Type</th><th>Shares</th><th>Price</th><th>Total</th></tr></thead><tbody>';
-        transactions.slice(0, 50).forEach(t => {
-            html += `<tr>
-                <td>${new Date(t.date).toLocaleString()}</td>
-                <td><strong>${t.username}</strong></td>
-                <td>${t.symbol}</td>
-                <td style="color:${t.type === 'BUY' ? '#00ff88' : '#ff3b30'}">${t.type}</td>
-                <td>${t.shares}</td>
-                <td>$${t.price.toFixed(2)}</td>
-                <td>$${t.total.toFixed(2)}</td>
-            </tr>`;
-        });
-        html += '</tbody></table>';
-        document.getElementById('transactionsList').innerHTML = html;
-    } catch(e) {
-        document.getElementById('transactionsList').innerHTML = '<p style="color:#ff3b30">Error loading transactions</p>';
-    }
-}
-
-function showAlert(elementId, message, type) {
-    const alertDiv = document.getElementById(elementId);
-    alertDiv.innerHTML = message;
-    alertDiv.className = `alert ${type}`;
-    setTimeout(() => { alertDiv.className = 'alert'; }, 3000);
+    alert('Stock updated');
 }
 
 function showTab(tab) {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(`${tab}Tab`).classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     event.target.classList.add('active');
-    if (tab === 'users') { loadUsers(); loadStats(); }
-    if (tab === 'stocks') loadStocks();
-    if (tab === 'transactions') loadTransactions();
+    document.getElementById(tab + 'Tab').classList.add('active');
+    if(tab === 'users') loadUsers();
+    if(tab === 'stocks') loadStocks();
 }
 
-// Initial load
-loadStats();
 loadUsers();
 loadStocks();
-loadTransactions();
 </script>
 </body>
 </html>
