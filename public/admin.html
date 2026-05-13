@@ -94,6 +94,11 @@
         }
         .alert.success { background: rgba(0,255,100,0.1); border: 1px solid #00ff88; color: #00ff88; display: block; }
         .alert.error { background: rgba(255,59,48,0.1); border: 1px solid #ff3b30; color: #ff3b30; display: block; }
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #00ff88;
+        }
         @media (max-width: 768px) {
             .stats { grid-template-columns: repeat(2, 1fr); }
             .tabs { justify-content: center; }
@@ -104,7 +109,7 @@
 <div class="container">
     <div class="header">
         <h1><i class="fas fa-shield-alt"></i> APEX HOLDINGS ADMIN</h1>
-        <p>Full control: Users, Stocks, Transactions</p>
+        <p>Full control: Users, Stocks, Transactions - Database Mode</p>
     </div>
 
     <div class="stats" id="stats">
@@ -150,7 +155,7 @@
                     <button onclick="deleteUser()" class="btn-danger"><i class="fas fa-trash"></i> Delete User</button>
                 </div>
             </div>
-            <div id="usersList"></div>
+            <div id="usersList"><div class="loading"><i class="fas fa-spinner fa-pulse"></i> Loading users...</div></div>
         </div>
     </div>
 
@@ -174,7 +179,7 @@
                     <button onclick="addStock()"><i class="fas fa-plus"></i> Add Stock</button>
                 </div>
             </div>
-            <div id="stocksList"></div>
+            <div id="stocksList"><div class="loading"><i class="fas fa-spinner fa-pulse"></i> Loading stocks...</div></div>
         </div>
     </div>
 
@@ -182,102 +187,83 @@
     <div id="transactionsTab" class="tab-content">
         <div class="card">
             <h2><i class="fas fa-history"></i> All Transactions</h2>
-            <div id="transactionsList"></div>
+            <div id="transactionsList"><div class="loading"><i class="fas fa-spinner fa-pulse"></i> Loading transactions...</div></div>
         </div>
     </div>
 </div>
 
 <script>
-// Stock data (must match main site)
-let stocks = [
-    {symbol: 'AAPL', name: 'Apple Inc.', price: 175.32},
-    {symbol: 'GOOGL', name: 'Alphabet Inc.', price: 142.65},
-    {symbol: 'MSFT', name: 'Microsoft Corp.', price: 378.45},
-    {symbol: 'AMZN', name: 'Amazon.com Inc.', price: 145.78},
-    {symbol: 'TSLA', name: 'Tesla Inc.', price: 245.67},
-    {symbol: 'META', name: 'Meta Platforms', price: 334.56},
-    {symbol: 'NVDA', name: 'NVIDIA Corp.', price: 895.23}
-];
+const ADMIN_SECRET = 'ApexMaster2024';
+let stocksList = [];
 
-function getUsers() {
-    return JSON.parse(localStorage.getItem('apex_users') || '[]');
+// Helper function to make admin API calls
+async function adminFetch(endpoint, options = {}) {
+    const res = await fetch(`/api/admin/${ADMIN_SECRET}/${endpoint}`, options);
+    return res.json();
 }
 
-function saveUsers(users) {
-    localStorage.setItem('apex_users', JSON.stringify(users));
+// Load statistics
+async function loadStats() {
+    try {
+        const stats = await adminFetch('stats');
+        document.getElementById('totalUsers').innerText = stats.totalUsers || 0;
+        document.getElementById('totalCash').innerText = '$' + (stats.totalCash || 0).toLocaleString();
+        document.getElementById('totalTrades').innerText = stats.totalTrades || 0;
+    } catch(e) { console.error(e); }
 }
 
-function saveStocks() {
-    localStorage.setItem('apex_stocks', JSON.stringify(stocks));
-}
-
-function loadStocksFromStorage() {
-    const saved = localStorage.getItem('apex_stocks');
-    if (saved) {
-        stocks = JSON.parse(saved);
-    } else {
-        saveStocks();
+// Load users from database
+async function loadUsers() {
+    try {
+        const users = await adminFetch('users');
+        
+        const cashSelect = document.getElementById('cashUserId');
+        const tierSelect = document.getElementById('tierUserId');
+        const resetSelect = document.getElementById('resetUserId');
+        
+        cashSelect.innerHTML = '<option value="">Select user...</option>';
+        tierSelect.innerHTML = '<option value="">Select user...</option>';
+        resetSelect.innerHTML = '<option value="">Select user...</option>';
+        
+        users.forEach(u => {
+            const tierName = u.tier == 1 ? 'Bronze' : u.tier == 2 ? 'Silver' : 'Gold';
+            cashSelect.innerHTML += `<option value="${u.id}">${u.username} - $${(u.cash || 0).toLocaleString()} (${tierName})</option>`;
+            tierSelect.innerHTML += `<option value="${u.id}">${u.username} - ${tierName}</option>`;
+            resetSelect.innerHTML += `<option value="${u.id}">${u.username} - ${tierName}</option>`;
+        });
+        
+        let html = '<table><thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Cash</th><th>Tier</th><th>Joined</th></tr></thead><tbody>';
+        users.forEach(u => {
+            const tierName = u.tier == 1 ? '🥉 Bronze' : u.tier == 2 ? '🥈 Silver' : '🥇 Gold';
+            html += `<tr>
+                <td>${u.id}</td>
+                <td><strong>${u.username}</strong></td>
+                <td>${u.email}</td>
+                <td style="color:#00ff88">$${(u.cash || 0).toLocaleString()}</td>
+                <td>${tierName}</td>
+                <td>${new Date(u.created_at).toLocaleDateString()}</td>
+            </tr>`;
+        });
+        html += '</tbody></table>';
+        document.getElementById('usersList').innerHTML = html;
+    } catch(e) {
+        document.getElementById('usersList').innerHTML = '<p style="color:#ff3b30">Error loading users</p>';
     }
 }
 
-loadStocksFromStorage();
-
-function loadStats() {
-    const users = getUsers();
-    let totalCash = 0;
-    let totalTrades = 0;
-    users.forEach(u => {
-        totalCash += u.cash || 0;
-        totalTrades += (u.history || []).length;
-    });
-    document.getElementById('totalUsers').innerText = users.length;
-    document.getElementById('totalCash').innerText = '$' + totalCash.toLocaleString();
-    document.getElementById('totalTrades').innerText = totalTrades;
-}
-
-function loadUsers() {
-    const users = getUsers();
-    
-    const cashSelect = document.getElementById('cashUserId');
-    const tierSelect = document.getElementById('tierUserId');
-    const resetSelect = document.getElementById('resetUserId');
-    
-    cashSelect.innerHTML = '<option value="">Select user...</option>';
-    tierSelect.innerHTML = '<option value="">Select user...</option>';
-    resetSelect.innerHTML = '<option value="">Select user...</option>';
-    
-    users.forEach(u => {
-        const tierName = u.tier == 1 ? 'Bronze' : u.tier == 2 ? 'Silver' : 'Gold';
-        cashSelect.innerHTML += `<option value="${u.id}">${u.username} - $${(u.cash || 0).toLocaleString()} (${tierName})</option>`;
-        tierSelect.innerHTML += `<option value="${u.id}">${u.username} - ${tierName}</option>`;
-        resetSelect.innerHTML += `<option value="${u.id}">${u.username} - ${tierName}</option>`;
-    });
-    
-    let html = '<table><thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Cash</th><th>Tier</th><th>Trades</th></tr></thead><tbody>';
-    users.forEach(u => {
-        const tierName = u.tier == 1 ? '🥉 Bronze' : u.tier == 2 ? '🥈 Silver' : '🥇 Gold';
-        html += `<tr>
-            <td>${u.id}</td>
-            <td><strong>${u.username}</strong></td>
-            <td>${u.email}</td>
-            <td style="color:#00ff88">$${(u.cash || 0).toLocaleString()}</td>
-            <td>${tierName}</td>
-            <td>${(u.history || []).length}</td>
-        </tr>`;
-    });
-    html += '</tbody></table>';
-    document.getElementById('usersList').innerHTML = html;
-}
-
-function addCash() {
-    const userId = parseInt(document.getElementById('cashUserId').value);
+// Add cash to user
+async function addCash() {
+    const userId = document.getElementById('cashUserId').value;
     const amount = parseFloat(document.getElementById('cashAmount').value);
     if (!userId || !amount) { alert('Select user and enter amount'); return; }
-    const users = getUsers();
-    const userIndex = users.findIndex(u => u.id === userId);
-    if (userIndex !== -1) {
-        users[userIndex].cash = (users[userIndex].cash || 0) + amount;
-        saveUsers(users);
+    
+    const res = await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}/cash`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount })
+    });
+    const data = await res.json();
+    if (data.success) {
         showAlert('userAlert', `Added $${amount} to user`, 'success');
         loadUsers();
         loadStats();
@@ -285,128 +271,140 @@ function addCash() {
     }
 }
 
-function changeTier() {
-    const userId = parseInt(document.getElementById('tierUserId').value);
+// Change user tier
+async function changeTier() {
+    const userId = document.getElementById('tierUserId').value;
     const tier = parseInt(document.getElementById('newTier').value);
     if (!userId) { alert('Select user'); return; }
-    const tierCapitals = {1: 1000, 2: 5000, 3: 15000};
-    const newCash = tierCapitals[tier];
-    const users = getUsers();
-    const userIndex = users.findIndex(u => u.id === userId);
-    if (userIndex !== -1) {
-        users[userIndex].tier = tier;
-        users[userIndex].cash = newCash;
-        saveUsers(users);
-        showAlert('userAlert', `Tier changed! New cash: $${newCash.toLocaleString()}`, 'success');
+    
+    const res = await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}/tier`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tier })
+    });
+    const data = await res.json();
+    if (data.success) {
+        showAlert('userAlert', `Tier changed! New cash: $${data.newCash.toLocaleString()}`, 'success');
         loadUsers();
         loadStats();
     }
 }
 
-function resetUser() {
-    const userId = parseInt(document.getElementById('resetUserId').value);
+// Reset user
+async function resetUser() {
+    const userId = document.getElementById('resetUserId').value;
     if (!userId || !confirm('Reset this user to tier capital?')) return;
-    const users = getUsers();
-    const userIndex = users.findIndex(u => u.id === userId);
-    if (userIndex !== -1) {
-        const tier = users[userIndex].tier || 1;
-        const tierCapitals = {1: 1000, 2: 5000, 3: 15000};
-        users[userIndex].cash = tierCapitals[tier];
-        users[userIndex].portfolio = [];
-        users[userIndex].history = [];
-        saveUsers(users);
-        showAlert('userAlert', 'User reset', 'success');
-        loadUsers();
-        loadStats();
-    }
+    
+    await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}/reset`, { method: 'POST' });
+    showAlert('userAlert', 'User reset', 'success');
+    loadUsers();
+    loadStats();
 }
 
-function deleteUser() {
-    const userId = parseInt(document.getElementById('resetUserId').value);
+// Delete user
+async function deleteUser() {
+    const userId = document.getElementById('resetUserId').value;
     if (!userId || !confirm('PERMANENTLY DELETE this user?')) return;
-    let users = getUsers();
-    users = users.filter(u => u.id !== userId);
-    saveUsers(users);
+    
+    await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}`, { method: 'DELETE' });
     showAlert('userAlert', 'User deleted', 'success');
     loadUsers();
     loadStats();
 }
 
-function loadStocksList() {
-    const select = document.getElementById('editStockSymbol');
-    select.innerHTML = '<option value="">Select stock...</option>';
-    stocks.forEach(s => {
-        select.innerHTML += `<option value="${s.symbol}">${s.symbol} - ${s.name} ($${s.price})</option>`;
-    });
-    
-    let html = '<table><thead><tr><th>Symbol</th><th>Name</th><th>Price</th></tr></thead><tbody>';
-    stocks.forEach(s => {
-        html += `<tr><td><strong>${s.symbol}</strong></td><td>${s.name}</td><td style="color:#00ff88">$${s.price.toFixed(2)}</td></tr>`;
-    });
-    html += '</tbody></table>';
-    document.getElementById('stocksList').innerHTML = html;
+// Load stocks from database
+async function loadStocks() {
+    try {
+        const stocks = await adminFetch('stocks');
+        stocksList = stocks;
+        
+        const select = document.getElementById('editStockSymbol');
+        select.innerHTML = '<option value="">Select stock...</option>';
+        stocks.forEach(s => {
+            select.innerHTML += `<option value="${s.symbol}">${s.symbol} - ${s.name} ($${s.price})</option>`;
+        });
+        
+        let html = '<table><thead><tr><th>Symbol</th><th>Name</th><th>Price</th></tr></thead><tbody>';
+        stocks.forEach(s => {
+            html += `<tr><td><strong>${s.symbol}</strong></td><td>${s.name}</td><td style="color:#00ff88">$${s.price.toFixed(2)}</td></tr>`;
+        });
+        html += '</tbody></table>';
+        document.getElementById('stocksList').innerHTML = html;
+    } catch(e) {
+        document.getElementById('stocksList').innerHTML = '<p style="color:#ff3b30">Error loading stocks</p>';
+    }
 }
 
-function updateStockPrice() {
+// Update stock price
+async function updateStockPrice() {
     const symbol = document.getElementById('editStockSymbol').value;
-    const newPrice = parseFloat(document.getElementById('editPrice').value);
-    if (!symbol || !newPrice) { alert('Select stock and enter price'); return; }
-    const stockIndex = stocks.findIndex(s => s.symbol === symbol);
-    if (stockIndex !== -1) {
-        stocks[stockIndex].price = newPrice;
-        saveStocks();
-        showAlert('stockAlert', `Price updated to $${newPrice}`, 'success');
-        loadStocksList();
+    const price = parseFloat(document.getElementById('editPrice').value);
+    if (!symbol || !price) { alert('Select stock and enter price'); return; }
+    
+    const stock = stocksList.find(s => s.symbol === symbol);
+    const name = stock.name;
+    
+    const res = await fetch(`/api/admin/${ADMIN_SECRET}/stock/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symbol, name, price })
+    });
+    const data = await res.json();
+    if (data.success) {
+        showAlert('stockAlert', `Price updated to $${price}`, 'success');
+        loadStocks();
         document.getElementById('editPrice').value = '';
     }
 }
 
-function addStock() {
+// Add new stock
+async function addStock() {
     const symbol = document.getElementById('newSymbol').value.toUpperCase();
     const name = document.getElementById('newName').value;
     const price = parseFloat(document.getElementById('newPrice').value);
     if (!symbol || !name || !price) { alert('Fill all fields'); return; }
-    if (stocks.find(s => s.symbol === symbol)) { alert('Stock already exists'); return; }
-    stocks.push({ symbol, name, price });
-    saveStocks();
-    showAlert('stockAlert', `Stock ${symbol} added!`, 'success');
-    document.getElementById('newSymbol').value = '';
-    document.getElementById('newName').value = '';
-    document.getElementById('newPrice').value = '';
-    loadStocksList();
+    
+    const res = await fetch(`/api/admin/${ADMIN_SECRET}/stock/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symbol, name, price })
+    });
+    const data = await res.json();
+    if (data.success) {
+        showAlert('stockAlert', `Stock ${symbol} added!`, 'success');
+        document.getElementById('newSymbol').value = '';
+        document.getElementById('newName').value = '';
+        document.getElementById('newPrice').value = '';
+        loadStocks();
+    }
 }
 
-function loadTransactions() {
-    const users = getUsers();
-    let allTransactions = [];
-    users.forEach(u => {
-        if (u.history && u.history.length) {
-            u.history.forEach(t => {
-                allTransactions.push({ ...t, username: u.username });
-            });
+// Load transactions
+async function loadTransactions() {
+    try {
+        const transactions = await adminFetch('transactions');
+        if (!transactions.length) {
+            document.getElementById('transactionsList').innerHTML = '<p>No transactions yet</p>';
+            return;
         }
-    });
-    allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    if (!allTransactions.length) {
-        document.getElementById('transactionsList').innerHTML = '<p>No transactions yet</p>';
-        return;
+        
+        let html = '<table><thead><tr><th>Date</th><th>User</th><th>Symbol</th><th>Type</th><th>Shares</th><th>Price</th><th>Total</th></tr></thead><tbody>';
+        transactions.slice(0, 50).forEach(t => {
+            html += `<tr>
+                <td>${new Date(t.date).toLocaleString()}</td>
+                <td><strong>${t.username}</strong></td>
+                <td>${t.symbol}</td>
+                <td style="color:${t.type === 'BUY' ? '#00ff88' : '#ff3b30'}">${t.type}</td>
+                <td>${t.shares}</td>
+                <td>$${t.price.toFixed(2)}</td>
+                <td>$${t.total.toFixed(2)}</td>
+            </tr>`;
+        });
+        html += '</tbody></table>';
+        document.getElementById('transactionsList').innerHTML = html;
+    } catch(e) {
+        document.getElementById('transactionsList').innerHTML = '<p style="color:#ff3b30">Error loading transactions</p>';
     }
-    
-    let html = '<table><thead><tr><th>Date</th><th>User</th><th>Symbol</th><th>Type</th><th>Shares</th><th>Price</th><th>Total</th></tr></thead><tbody>';
-    allTransactions.slice(0, 50).forEach(t => {
-        html += `<tr>
-            <td>${new Date(t.date).toLocaleString()}</td>
-            <td><strong>${t.username}</strong></td>
-            <td>${t.symbol}</td>
-            <td style="color:${t.type === 'BUY' ? '#00ff88' : '#ff3b30'}">${t.type}</td>
-            <td>${t.shares}</td>
-            <td>$${t.price.toFixed(2)}</td>
-            <td>$${t.total.toFixed(2)}</td>
-        </tr>`;
-    });
-    html += '</tbody></table>';
-    document.getElementById('transactionsList').innerHTML = html;
 }
 
 function showAlert(elementId, message, type) {
@@ -422,13 +420,14 @@ function showTab(tab) {
     document.getElementById(`${tab}Tab`).classList.add('active');
     event.target.classList.add('active');
     if (tab === 'users') { loadUsers(); loadStats(); }
-    if (tab === 'stocks') loadStocksList();
+    if (tab === 'stocks') loadStocks();
     if (tab === 'transactions') loadTransactions();
 }
 
+// Initial load
 loadStats();
 loadUsers();
-loadStocksList();
+loadStocks();
 loadTransactions();
 </script>
 </body>
