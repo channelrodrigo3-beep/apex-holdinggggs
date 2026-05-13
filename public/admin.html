@@ -40,7 +40,7 @@
             overflow: hidden;
         }
         th, td {
-            padding: 10px;
+            padding: 12px;
             text-align: left;
             border-bottom: 1px solid #333;
         }
@@ -61,7 +61,6 @@
             font-weight: bold;
         }
         .error { color: #ff3b30; text-align: center; padding: 20px; }
-        .success { color: #00ff88; text-align: center; padding: 10px; display: none; }
         .tabs {
             display: flex;
             gap: 10px;
@@ -111,7 +110,9 @@ const ADMIN_SECRET = 'ApexMaster2024';
 async function fetchAPI(endpoint) {
     try {
         const res = await fetch(`/api/admin/${ADMIN_SECRET}/${endpoint}`);
-        return await res.json();
+        const data = await res.json();
+        console.log(endpoint, data);
+        return data;
     } catch(e) {
         console.error(e);
         return null;
@@ -130,18 +131,19 @@ async function loadStats() {
 async function loadUsers() {
     const users = await fetchAPI('users');
     if(users && users.length > 0) {
-        let html = '</td><thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Cash</th><th>Tier</th><th>Action</th></tr></thead><tbody>';
+        let html = '<table><thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Cash</th><th>Tier</th><th>Add Cash</th></tr></thead><tbody>';
         users.forEach(u => {
+            let tierName = u.tier == 1 ? 'Bronze' : (u.tier == 2 ? 'Silver' : 'Gold');
             html += `<tr>
                 <td>${u.id}</td>
                 <td>${u.username}</td>
-                <td>${u.email}</td>
-                <td>$${u.cash}</td>
-                <td>${u.tier == 1 ? 'Bronze' : u.tier == 2 ? 'Silver' : 'Gold'}</td>
-                <td><button onclick="addCash(${u.id})">+$1000</button></td>
+                <td>${u.email || '-'}</td>
+                <td style="color:#00ff88">$${parseFloat(u.cash).toLocaleString()}</td>
+                <td>${tierName}</td>
+                <td><button onclick="addCash(${u.id})">+$1000</button> <button onclick="addCash5000(${u.id})">+$5000</button></td>
             </tr>`;
         });
-        html += '</tbody><table>';
+        html += '</tbody></table>';
         document.getElementById('usersList').innerHTML = html;
     } else {
         document.getElementById('usersList').innerHTML = '<div class="error">No users found. Create an account first.</div>';
@@ -159,15 +161,26 @@ async function addCash(userId) {
     loadUsers();
 }
 
+async function addCash5000(userId) {
+    await fetch(`/api/admin/${ADMIN_SECRET}/user/${userId}/cash`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: 5000 })
+    });
+    alert('Added $5000');
+    loadUsers();
+}
+
 async function loadStocks() {
     const stocks = await fetchAPI('stocks');
-    if(stocks) {
-        let html = '<table><thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>Action</th></tr></thead><tbody>';
+    if(stocks && stocks.length > 0) {
+        let html = '<table><thead><tr><th>Symbol</th><th>Name</th><th>Current Price</th><th>New Price</th><th>Action</th></tr></thead><tbody>';
         stocks.forEach(s => {
             html += `<tr>
                 <td>${s.symbol}</td>
                 <td>${s.name}</td>
-                <td><input type="number" id="price_${s.symbol}" value="${s.price}" step="0.01" style="width:100px"></td>
+                <td style="color:#00ff88">$${s.price.toFixed(2)}</td>
+                <td><input type="number" id="price_${s.symbol}" step="0.01" placeholder="New price" style="width:100px"></td>
                 <td><button onclick="updateStock('${s.symbol}')">Update</button></td>
             </tr>`;
         });
@@ -179,14 +192,16 @@ async function loadStocks() {
 }
 
 async function updateStock(symbol) {
-    const price = document.getElementById(`price_${symbol}`).value;
-    const stock = { symbol, name: symbol, price: parseFloat(price) };
+    const newPrice = document.getElementById(`price_${symbol}`).value;
+    if(!newPrice) { alert('Enter a price'); return; }
+    const stock = { symbol, name: symbol, price: parseFloat(newPrice) };
     await fetch(`/api/admin/${ADMIN_SECRET}/stock/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(stock)
     });
-    alert('Stock updated');
+    alert('Stock updated!');
+    loadStocks();
 }
 
 function showTab(tab) {
