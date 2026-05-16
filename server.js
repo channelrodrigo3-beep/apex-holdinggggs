@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(session({
-    secret: 'apex-secret-key-2024',
+    secret: 'apex-secret-key',
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false }
@@ -22,62 +22,74 @@ const pool = new Pool({
     ssl: { rejectUnauthorized: false }
 });
 
+// Create all tables
 async function initDB() {
-    await pool.query(`
-        CREATE TABLE IF NOT EXISTS users (
-            id SERIAL PRIMARY KEY,
-            username TEXT UNIQUE NOT NULL,
-            email TEXT NOT NULL,
-            password TEXT NOT NULL,
-            cash REAL DEFAULT 0,
-            tier INTEGER DEFAULT 1,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    `);
-    
-    await pool.query(`
-        CREATE TABLE IF NOT EXISTS portfolio (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER REFERENCES users(id),
-            symbol TEXT NOT NULL,
-            shares INTEGER NOT NULL,
-            avg_price REAL NOT NULL
-        )
-    `);
-    
-    await pool.query(`
-        CREATE TABLE IF NOT EXISTS transactions (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER REFERENCES users(id),
-            symbol TEXT NOT NULL,
-            type TEXT NOT NULL,
-            shares INTEGER NOT NULL,
-            price REAL NOT NULL,
-            total REAL NOT NULL,
-            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    `);
-    
-    await pool.query(`
-        CREATE TABLE IF NOT EXISTS stocks (
-            symbol TEXT PRIMARY KEY,
-            name TEXT NOT NULL,
-            price REAL NOT NULL
-        )
-    `);
-    
-    const result = await pool.query("SELECT COUNT(*) FROM stocks");
-    if (parseInt(result.rows[0].count) === 0) {
+    try {
+        // Users table
         await pool.query(`
-            INSERT INTO stocks (symbol, name, price) VALUES 
-            ('AAPL', 'Apple Inc.', 175.32),
-            ('GOOGL', 'Alphabet Inc.', 142.65),
-            ('MSFT', 'Microsoft Corp.', 378.45),
-            ('AMZN', 'Amazon.com Inc.', 145.78),
-            ('TSLA', 'Tesla Inc.', 245.67),
-            ('META', 'Meta Platforms', 334.56),
-            ('NVDA', 'NVIDIA Corp.', 895.23)
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                username TEXT UNIQUE NOT NULL,
+                email TEXT NOT NULL,
+                password TEXT NOT NULL,
+                cash REAL DEFAULT 0,
+                tier INTEGER DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
         `);
+        
+        // Portfolio table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS portfolio (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER REFERENCES users(id),
+                symbol TEXT NOT NULL,
+                shares INTEGER NOT NULL,
+                avg_price REAL NOT NULL
+            )
+        `);
+        
+        // Transactions table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS transactions (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER REFERENCES users(id),
+                symbol TEXT NOT NULL,
+                type TEXT NOT NULL,
+                shares INTEGER NOT NULL,
+                price REAL NOT NULL,
+                total REAL NOT NULL,
+                date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        
+        // Stocks table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS stocks (
+                symbol TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                price REAL NOT NULL
+            )
+        `);
+        
+        // Insert default stocks if empty
+        const stockCheck = await pool.query("SELECT COUNT(*) FROM stocks");
+        if (parseInt(stockCheck.rows[0].count) === 0) {
+            await pool.query(`
+                INSERT INTO stocks (symbol, name, price) VALUES 
+                ('AAPL', 'Apple Inc.', 175.32),
+                ('GOOGL', 'Alphabet Inc.', 142.65),
+                ('MSFT', 'Microsoft Corp.', 378.45),
+                ('AMZN', 'Amazon.com Inc.', 145.78),
+                ('TSLA', 'Tesla Inc.', 245.67),
+                ('META', 'Meta Platforms', 334.56),
+                ('NVDA', 'NVIDIA Corp.', 895.23)
+            `);
+        }
+        
+        console.log("✅ Database initialized");
+    } catch (err) {
+        console.error("Database init error:", err.message);
     }
 }
 
@@ -88,6 +100,7 @@ async function getStocks() {
     return result.rows;
 }
 
+// ============ AUTH ROUTES ============
 app.post('/api/register', async (req, res) => {
     const { username, email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -145,15 +158,6 @@ app.get('/api/user', async (req, res) => {
     }
     
     res.json({ ...user, portfolioValue, totalValue: user.cash + portfolioValue });
-});
-
-app.get('/api/user-tier', async (req, res) => {
-    if (!req.session.userId) return res.status(401).json({ error: "Unauthorized" });
-    const result = await pool.query("SELECT tier FROM users WHERE id = $1", [req.session.userId]);
-    const tier = result.rows[0]?.tier || 1;
-    const tierNames = {1: 'Bronze', 2: 'Silver', 3: 'Gold'};
-    const tierCapital = {1: 1000, 2: 5000, 3: 15000};
-    res.json({ tier, name: tierNames[tier], capital: tierCapital[tier] });
 });
 
 app.get('/api/stocks', async (req, res) => {
@@ -298,18 +302,13 @@ app.post('/api/verify-password', async (req, res) => {
     res.json({ valid });
 });
 
+// ============ ADMIN ROUTES ============
 const ADMIN_SECRET = 'ApexMaster2024';
 
 app.get('/api/admin/:secret/users', async (req, res) => {
     if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
-    try {
-        const result = await pool.query("SELECT id, username, email, cash, tier, created_at FROM users");
-        console.log("Users found:", result.rows.length);
-        res.json(result.rows);
-    } catch (err) {
-        console.error("Error:", err.message);
-        res.status(500).json({ error: err.message });
-    }
+    const result = await pool.query("SELECT id, username, email, cash, tier, created_at FROM users ORDER BY id DESC");
+    res.json(result.rows);
 });
 
 app.post('/api/admin/:secret/user/:id/cash', async (req, res) => {
@@ -388,17 +387,13 @@ app.get('/api/admin/:secret/transactions', async (req, res) => {
 
 app.get('/api/admin/:secret/stats', async (req, res) => {
     if (req.params.secret !== ADMIN_SECRET) return res.status(403).json({ error: "Unauthorized" });
-    try {
-        const userStats = await pool.query("SELECT COUNT(*) as totalUsers, COALESCE(SUM(cash), 0) as totalCash FROM users");
-        const tradeStats = await pool.query("SELECT COUNT(*) as totalTrades FROM transactions");
-        res.json({
-            totalUsers: parseInt(userStats.rows[0].totalusers) || 0,
-            totalCash: parseFloat(userStats.rows[0].totalcash) || 0,
-            totalTrades: parseInt(tradeStats.rows[0].totaltrades) || 0
-        });
-    } catch (err) {
-        res.json({ totalUsers: 0, totalCash: 0, totalTrades: 0 });
-    }
+    const userStats = await pool.query("SELECT COUNT(*) as totalUsers, COALESCE(SUM(cash), 0) as totalCash FROM users");
+    const tradeStats = await pool.query("SELECT COUNT(*) as totalTrades FROM transactions");
+    res.json({
+        totalUsers: parseInt(userStats.rows[0].totalusers) || 0,
+        totalCash: parseFloat(userStats.rows[0].totalcash) || 0,
+        totalTrades: parseInt(tradeStats.rows[0].totaltrades) || 0
+    });
 });
 
 app.get('/', (req, res) => {
